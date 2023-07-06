@@ -1,0 +1,59 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block title %} 数据字段规范 | 元数据管理平台 {% endblock %}
+
+{% block content_title %} 数据字段规范 {% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="/admin/metadata/hivesearch">元数据管理</a></li>
+    <li class="active">数据字段规范</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <div class="col-md-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h4 class="box-title">
+                    数据字段规范说明
+                </h4>
+            </div>
+
+            <div class="box-body" style="line-height:30px;">
+                <h3>命名</h3>
+字段名称应该能够包含相关字段的含义，多个单词之间使用下划线分割，单词如果过长可以使用单词的缩写 <br/>
+                单词不知如何缩写可以参考网站 <a href="https://www.allacronyms.com/">https://www.allacronyms.com/</a> <br/>
+如果上游已经定义好对应的字段名那就直接使用，尽量不要定义新的字段名<br/>
+每个字段都必须要写注释，对于枚举类型的数字最好说明该数字代表的含义<br/>
+
+                <h3>字段词根</h3>
+                不知道怎么定义字段名，先去词根里面查找 <a href="http://metadata.aerohuanyou.com:8097/admin/metadata/wordsummary/">http://metadata.aerohuanyou.com:8097/admin/metadata/wordsummary/</a><br/>
+如果已经定义好了对应的英文名称，直接使用已经有的名称。<br/>
+如果没有对应英文名称，可以自己定义然后维护到词根里面，提供给别人使用。<br/>
+
+                <h3>类型</h3>
+-- 对于相同字段名称在不同的表里面需要统一使用相同的字段类型，例如对于编码字段不允许出现在一个表里面是int,在另一个表里面是string <br />
+-- 一般情况我们使用这些数据类型定义，字符串使用string类型，时间戳使用bigint,维度表里面的id使用int,时间字段可以使用datetime,涉及到金额的字段统一使用decimal类型，一般使用decimail(20,4),不建议使用double类型<br />
+            </div>
+        </div>
+        </div>
+
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script>
+</script>
+{% endblock %}

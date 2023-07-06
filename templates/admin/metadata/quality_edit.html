@@ -1,0 +1,464 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <form action="" method="post" id="quality_form">
+            {% csrf_token %}
+        <div class="col-md-9">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        质量规则修改
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">规则名称</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="rule_name" class="vTextField" value="{{ quality_info.rule_name }}" maxlength="100" required="" id="rule_name">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="id" value="{{ object_id }}" />
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">规则类型</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+
+                                {% ifequal quality_info.rule_type 1 %}
+                                        表级规则
+	                            {% endifequal %}
+                                {% ifequal quality_info.rule_type 2 %}
+                                        字段级规则
+	                            {% endifequal %}
+                                {% ifequal quality_info.rule_type 3 %}
+                                        自定义SQL
+	                            {% endifequal %}
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_db_table" style="line-height:35px;">
+                            <label class="col-sm-2 control-label text-right">选定内容</label>
+                            <div class="col-sm-10">
+                                    <span class="text-red" style="margin-left: -10px;">* </span>
+
+                                {% ifnotequal quality_info.db_name '0' %}
+                                    数据库：{{ quality_info.db_name }}
+                                {% endifnotequal %}
+
+                                {% ifnotequal quality_info.table_name '0' %}
+                                    数据表：{{ quality_info.table_name }}
+                                {% endifnotequal %}
+
+                                {% ifnotequal quality_info.column_name '0' %}
+                                    列名：{{ quality_info.column_name }}
+                                {% endifnotequal %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">采样方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                            {% ifequal quality_info.sampling_mode 'mode_count' %}
+                                    count
+                            {% endifequal %}
+
+                            {% ifequal quality_info.sampling_mode 'mode_sum' %}
+                                    sum
+                            {% endifequal %}
+
+                             {% ifequal quality_info.sampling_mode 'mode_avg' %}
+                                    avg
+                            {% endifequal %}
+                            {% ifequal quality_info.sampling_mode 'mode_max' %}
+                                    max
+                            {% endifequal %}
+                             {% ifequal quality_info.sampling_mode 'mode_min' %}
+                                    min
+                            {% endifequal %}
+                             {% ifequal quality_info.sampling_mode 'mode_null' %}
+                                    空值
+                            {% endifequal %}
+                             {% ifequal quality_info.sampling_mode 'mode_zero' %}
+                                    0值
+                            {% endifequal %}
+                            {% ifequal quality_info.sampling_mode 'mode_repeat' %}
+                                    重复值
+                            {% endifequal %}
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_filter_condition">
+                            <label class="col-sm-2 control-label text-right">过滤条件</label>
+                            <div class="col-sm-7">
+                                <textarea name="filter_condition" cols="40" rows="3" class="" >{{quality_info.filter_condition }} </textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red">日期使用pdt={yesterday}的格式</div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_custom_sql" style="display:none;">
+                            <label class="col-sm-2 control-label text-right">自定义sql</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <textarea name="custom_sql" id="custom_sql" cols="40" rows="6" class="vLargeTextField">{{ quality_info.custom_sql}}</textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">校验类型</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                {% ifequal quality_info.check_type 1 %}
+                                    数值型
+                                {% endifequal %}
+                                {% ifequal quality_info.check_type 2 %}
+                                    波动率型
+                                {% endifequal %}
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">校验方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                {% ifequal quality_info.check_mode 1 %}
+                                    与固定值比较
+                                {% endifequal %}
+                                {% ifequal quality_info.check_mode 2 %}
+                                    与昨天对比
+                                {% endifequal %}
+                                 {% ifequal quality_info.check_mode 3 %}
+                                    7天平均值对比
+                                {% endifequal %}
+                                 {% ifequal quality_info.check_mode 4 %}
+                                    30天平均值对比
+                                {% endifequal %}
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">比较方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                {{ quality_info.compare_mode }}
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_excepted_value" {% ifnotequal quality_info.check_type 1 %} style="display:none;"  {% endifnotequal %}>
+                            <label class="col-sm-2 control-label text-right">期望值</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="number" name="excepted_value" value="{{ quality_info.excepted_value }}"  step="any" />
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_percent" {% ifnotequal quality_info.check_type 2 %} style="display:none;"  {% endifnotequal %}>
+                            <label class="col-sm-2 control-label text-right">波动值</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="number" name="percent_min" value="{{ quality_info.percent_min }}" step="any" /> %
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">规则描述</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <textarea name="rule_desc" cols="40" rows="3" class="" required="">{{ quality_info.rule_desc }}</textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">报警方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                {% ifequal quality_info.warning_mode 1 %}
+                                    邮件
+                                 {% endifequal %}
+                                 {% ifequal quality_info.warning_mode 2 %}
+                                    短信
+                                 {% endifequal %}
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">报警接收人</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="warning_receiver" class="vTextField" maxlength="100" value="{{ quality_info.warning_receiver}}" required="" id="warning_receiver">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red">多个接收人以;号分割</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">状态</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="status" id="status">
+                                    <option value="on" {% if quality_info.status == 'on' %} selected="selected" {% endif %} >上线</option>
+                                    <option value="off" {% if quality_info.status == 'off' %} selected="selected" {% endif %}>下线</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">执行方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="execute_type" id="execute_type">
+                                    <option value="1" {% if quality_info.execute_type == 1 %} selected="selected" {% endif %}>系统统一执行</option>
+                                    <option value="2" {% if quality_info.execute_type == 2 %} selected="selected" {% endif %}>自定义时间执行</option>
+                                </select>
+                                &nbsp;&nbsp;
+                                <span id="execute_div" style="{% if quality_info.execute_type != 2 %}display:none;{% endif %}">
+                                <input type="text" name="execute_hour" value="{{ quality_info.execute_hour }}" size="15" style="height:34px;font-size:14px;">
+                                </span>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 hidden-sm hidden-xs">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        操作面板
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <input type="submit" value="保存" class="btn btn-primary form-control" name="_save">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="button" value="返回规则列表" id="return_quality" class="btn btn-primary form-control" name="_save">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    function ajax_get_table_name(){
+        db_value = $("#db_name").val();
+
+        $.ajax({
+                type:"GET",
+                url:" /ajax/get_table_name?db_name=" + db_value,
+                dataType:"json",
+                success:function(res){
+                    if(res.success=='ok'){
+                        table_html = '<option value="0" selected>请选择表</option>'
+                        $.each(res.data,function(index,value){
+                             table_html += '<option value="'+value.table_name+'">'+value.table_name+'</option>'
+                             //console.log(value.table_name)
+                        });
+                        //console.log(table_html)
+                        $("#table_name").html(table_html)
+                    }else{
+                        console.log('error!')
+                    }
+                }
+            });
+    }
+
+    function ajax_get_column_name(){
+        db_value = $("#db_name").val();
+        table_value = $("#table_name").val();
+
+        $.ajax({
+                type:"GET",
+                url:"/ajax/get_column_name?db_name="+db_value+"&table_name=" + table_value,
+                dataType:"json",
+                success:function(res){
+                    if(res.success=='ok'){
+                        column_html = '<option value="0" selected>请选择列</option>'
+                        $.each(res.data,function(index,value){
+                             column_html += '<option value="'+value.column_name+'">'+value.column_name+'</option>'
+
+                             //console.log(value.table_name)
+                        });
+
+                        //console.log(column_html)
+                        $("#column_name").html(column_html)
+                    }else{
+                        console.log('error!')
+                    }
+                }
+            });
+    }
+
+    // 设置规则类型选项切换，自定义sql的展示，表级和列级的展示
+    $("#rule_type").change(function(){
+        console.log($(this).val())
+        rule_type = $(this).val()
+        if(rule_type == 3){
+            $("#div_custom_sql").show()
+            $("#div_filter_condition").hide()
+            $("#div_db_table").hide()
+            $("#div_column_name").hide()
+
+            $("#sampling_mode").html('<option value="mode_custom">自定义SQL</option>')
+        }else if(rule_type==2) {
+            $("#div_custom_sql").hide()
+            $("#div_filter_condition").show()
+            $("#div_db_table").show()
+            $("#div_column_name").show()
+            $("#sampling_mode").html('<option value="mode_sum">sum</option>'+
+                                    '<option value="mode_avg">avg</option>'+
+                                    '<option value="mode_max">max</option>'+
+                                    '<option value="mode_min">min</option>'+
+                                    '<option value="mode_null">空值</option>'+
+                                    '<option value="mode_zero">0值</option>'+
+                                    '<option value="mode_repeat">重复值</option>')
+
+            ajax_get_column_name();
+        }else {
+            $("#div_custom_sql").hide()
+            $("#div_filter_condition").show()
+            $("#div_db_table").show()
+            $("#div_column_name").hide()
+
+            $("#sampling_mode").html('<option value="mode_count">count</option>')
+
+        }
+    })
+
+    //ajax_get_table_name();
+    //ajax_get_column_name();
+
+    // 库名切换，选择表名
+    $("#db_name").change(function(){
+        ajax_get_table_name();
+        console.log('db_name change')
+        //$("#column_name").html('<option value="0">请选择</option>)
+    });
+    $("#table_name").change(function(){
+        ajax_get_column_name();
+    });
+
+    // 校验类型切换
+    $("#check_type").change(function(){
+        check_type_val = $(this).val();
+        if(check_type_val == 1){
+            $("#check_mode").html('<option value="1">与固定值比较</option>');
+            $("#compare_mode").html('<option value="gt"> > </option>'+
+                                    '<option value="gte"> >= </option>'+
+                                    '<option value="lt"> < </option>'+
+                                    '<option value="lte"> <= </option>'+
+                                    '<option value="equal"> = </option>'+
+                                    '<option value="nequal"> != </option>');
+            $("#div_excepted_value").show();
+            $("#div_percent").hide();
+        }else{
+            $("#check_mode").html('<option value="2">与昨天对比</option>'+
+                                    '<option value="3">7天平均值对比</option>'+
+                                    '<option value="4">30天平均值对比</option>');
+            $("#compare_mode").html('<option value="rise"> 上升 </option>'+
+                                    '<option value="decline"> 下降 </option>'+
+                                    '<option value="abs"> 绝对值 </option>');
+            $("#div_excepted_value").hide();
+            $("#div_percent").show();
+        }
+    });
+
+
+    $("#execute_type").change(function(){
+        execute_type_val = $(this).val();
+        if(execute_type_val == 2){
+            $("#execute_div").show();
+        }else{
+            $("#execute_div").hide();
+        }
+    });
+
+    $("#return_quality").click(function(){
+        window.location.href='/admin/metadata/qualityrule'
+    });
+
+
+</script>
+{% endblock %}

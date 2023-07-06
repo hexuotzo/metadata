@@ -1,0 +1,265 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <form action="" method="post" id="task_form">
+            {% csrf_token %}
+        <div class="col-md-9">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        任务修改
+                    </h4>
+                </div>
+                <input type="hidden" name="id" value="{{ object_id }}" />
+
+                <div class="box-body">
+                    <div class="form-group">
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">项目</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">&nbsp; </span>
+                                <select class="vSelectField" style="width: 100%;" name="project_id" id="project_id" >
+                                    <option value="0">请选择项目</option>
+                                    {% for project in project_list %}
+                                        <option  value="{{ project.id }}" {% ifequal project.id task_info.project_id.id %} selected {% endifequal %} >{{ project.project_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="help-block red project_id_help"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">任务标识</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="task_identification" value="{{ task_info.task_identification }}" class="vTextField" maxlength="100" disabled required="" id="task_identification">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">任务名称</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="task_name" class="vTextField" value="{{ task_info.task_name }}" maxlength="100" required="" id="task_name">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">任务描述</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <textarea name="task_desc" cols="40" rows="3" class="" required="">{{ task_info.task_desc }}</textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">责任人</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="select2" style="width: 100%;" name="owner_name" >
+                                    {% for user in user_list %}
+                                        <option  value="{{ user.username }}" {% if user.username == task_info.owner_name %} selected {% endif %} >{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">任务依赖</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">&nbsp; </span>
+                                <select class="select2 vSelectField" multiple style="width: 100%;" name="task_depend[]" >
+                                    {% for tag in task_tag %}
+                                        <option  value="{{ tag.id }}" {% if tag.id in depend_all %} selected {% endif %}>{{ tag.project_name }}-{{ tag.task_identification }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">调度频率</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">&nbsp; </span>
+                                <select class="vSelectField" style="width: 100%;" name="frequency" >
+                                    <option value="1" {% if task_info.frequency == 1 %} selected {% endif %}>小时</option>
+                                    <option value="2" {% if task_info.frequency == 2 %} selected {% endif %}>天</option>
+                                    <option value="3" {% if task_info.frequency == 3 %} selected {% endif %}>周</option>
+                                    <option value="4" {% if task_info.frequency == 4 %} selected {% endif %}>月</option>
+                                    <option value="5" {% if task_info.frequency == 5 %} selected {% endif %}>季度</option>
+                                    <option value="6" {% if task_info.frequency == 6 %} selected {% endif %}>年</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">执行命令</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <textarea name="execute_command" cols="60" rows="4" class="" required="">{{ task_info.execute_command }}</textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block">
+                                    <a href="javascript:void(0)" data-toggle="modal" data-target="#modal-default">查看全局变量</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">状态</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="vSelectField" style="width: 100%;" name="status" >
+                                    <option value="1" {% if task_info.status == 1 %} selected {% endif %}>上线</option>
+                                    <option value="0" {% if task_info.status == 0 %} selected {% endif %}>下线</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 hidden-sm hidden-xs">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        操作面板
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <input type="submit" value="保存" class="btn btn-primary form-control" name="_save">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="button" value="返回任务列表" id="return_task" class="btn btn-primary form-control" name="_save">
+                    </div>
+                </div>
+
+                <input type="hidden" id="task_name_exist" value="0" />
+            </div>
+
+        </div>
+        </form>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">全局变量</h4>
+            </div>
+            <div class="modal-body">
+            <p>
+                spark_online: spark-sql --master yarn --queue online --executor-memory 3G <br/>
+    cloud_spark_online: spark-sql --master yarn --queue online --executor-memory 4G -hiveconf hive.exec.compress.output=true <br />
+    cloud_spark_big: spark-sql --master yarn --queue online  --executor-memory 7G --conf spark.yarn.executor.memoryOverhead=2048  --executor-cores 2 -hiveconf hive.exec.compress.output=true <br />
+    hive: hive -hiveconf hive.exec.compress.intermediate=true -hiveconf hive.exec.compress.output=true -hiveconf tez.queue.name=online <br/>
+    year: ${azkaban.flow.start.year} <br/>
+    month: ${azkaban.flow.start.month}<br/>
+    day: ${azkaban.flow.start.day}<br/>
+    time: $(new("org.joda.time.DateTime").minusDays(1).toString("yyyy-MM-dd HH:mm:ss"))<br/>
+
+    # hdfs 标记路径<br/>
+    hdfs_target: /home/hdfs/status<br/>
+
+    # 代码路径<br/>
+    cur_dir: /project/{project_name}<br/>
+
+    # 当天<br/>
+    C_DATE: $(new("org.joda.time.DateTime").toString("yyyy-MM-dd"))<br/>
+
+    # 昨天，通常为t-1跑批日期<br/>
+    SDATE: $(new("org.joda.time.DateTime").minusDays(1).toString("yyyy-MM-dd"))<br/>
+
+    # 前天，t-2 日期<br/>
+    YT_DATE: $(new("org.joda.time.DateTime").minusDays(2).toString("yyyy-MM-dd"))</p>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<style>
+
+.select2-container-multi .select2-choices li {
+    float: none;
+    list-style: none;
+}
+</style>
+<script>
+$(".select2").select2({
+    placeholder : '请选择依赖任务',
+});
+$("#return_task").click(function(){
+    window.location.href='/admin/schedule/task'
+});
+
+$('#task_form').submit(function(){
+    project_id_val = $("#project_id").val();
+    // 项目不能为空
+    if($("#project_id").val() == '0'){
+        alert('请选择项目');
+        //$(".project_id_help").html('请选择项目');
+        return false;
+    }
+    // 项目和任务标识唯一验证
+    identification_name = $("#task_identification").val();
+
+})
+</script>
+{% endblock %}

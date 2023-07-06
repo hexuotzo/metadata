@@ -1,0 +1,281 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <form action="" method="post" id="monitor_form">
+            {% csrf_token %}
+        <div class="col-md-9">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        离线监控任务修改
+                    </h4>
+                </div>
+                <input type="hidden" name="id" value="{{ object_id }}" />
+
+                <div class="box-body">
+                    <div class="form-group">
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">任务标识</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="vSelectField select2" style="width: 100%;" name="task_identification" id="task_identification" >
+                                <option value="0">请选择任务</option>
+                                {% for task in task_all %}
+                                    <option  value="{{ task.task_identification }}" {% ifequal task.task_identification task_monitor.task_identification %} selected {% endifequal %} >{{ task.task_identification }}</option>
+                                {% endfor %}
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">任务名称</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="monitor_name" class="vTextField" value="{{ task_monitor.monitor_name }}" maxlength="100" required="" id="monitor_name">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">责任人</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="select2" style="width: 100%;" name="owner_id" >
+                                    <option value="">请选择</option>
+                                    {% for user in user_list %}
+                                        <option  value="{{ user.username }}" {% ifequal task_monitor.owner_name user.username %} selected {% endifequal %}>{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">监控方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="" style="width: 100%;" name="monitor_mode" id="monitor_mode" >
+                                        <option  value="1" {% ifequal task_monitor.monitor_mode 1 %} selected {% endifequal %}>完成时间监控</option>
+                                        <option  value="2" {% ifequal task_monitor.monitor_mode 2 %} selected {% endifequal %}>运行时长监控</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">监控条件</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <span id="finish_time_div" style="display:{% ifequal task_monitor.monitor_mode 1 %}''; {% else %} none; {% endifequal %} ">
+                                晚于 <select class="" style="" name="finish_time" id="finish_time" >
+                                    {% for time in finish_time %}
+                                    <option value="{{time}}" {% ifequal task_monitor.finish_time time %} selected {% endifequal %}>{{ time }}</option>
+                                    {% endfor %}
+                                </select> 点</span>
+                                <span id="run_time_div" style="display:{% ifequal task_monitor.monitor_mode 2 %}''; {%  else %} none; {% endifequal %}">
+                                大于 <select class="" style="" name="run_time" id="run_time" >
+                                    {% for time in run_time %}
+                                    <option value="{{time}}" {% ifequal task_monitor.run_time time %} selected {% endifequal %}>{{ time }}小时</option>
+                                    {% endfor %}
+                                </select></span>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">报警接收人</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="vSelectField select2" multiple  style="width: 100%;" name="receivers[]" >
+
+                                    {% for user in project_and_user %}
+                                        <option  value="{{ user.id }}" {% if user.id in receiver %} selected {% endif %} >{{ user.name }}</option>
+                                    {% endfor %}
+
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">报警发送时间</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="is_warning_custom" id="is_warning_custom">
+                                    <option value="1" {% if task_monitor.is_warning_custom == 1 %} selected {% endif %}>系统自动</option>
+                                    <option value="2" {% if task_monitor.is_warning_custom == 2 %} selected {% endif %}>自定义时间</option>
+                                </select>
+                                <span id="warning_send_time_div" style="display:{% if task_monitor.is_warning_custom == 1 %} none {% else %} '' {% endif %};">
+                                <input type="text" name="warning_send_time" class="timepicker" maxlength="100" id="warning_send_time" value="{{ task_monitor.warning_send_time }}">
+                                </span>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">报警方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="warning_type">
+                                    <option value="1">邮件</option>
+                                </select>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">状态</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="status">
+                                    <option value="1" {% if task_monitor.status == 1 %} selected {% endif %}>上线</option>
+                                    <option value="2" {% if task_monitor.status == 2 %} selected {% endif %}>下线</option>
+                                </select>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 hidden-sm hidden-xs">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        操作面板
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <input type="submit" value="保存" class="btn btn-primary form-control" name="_save">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="button" value="返回任务监控列表" id="return_task" class="btn btn-primary form-control" name="_save">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </form>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+{% block extrajs %}
+<link rel="stylesheet" href={% static "css/timepicker.min.css" %}>
+
+<style>
+
+.select2-container-multi .select2-choices li {
+    float: none;
+    list-style: none;
+}
+.timepicker{
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+</style>
+<script type="text/javascript" src="{% static "js/timepicker.min.js" %}"></script>
+
+<script>
+$('.timepicker').timepicker({
+    'timeFormat': 'HH:mm',
+    'minTime': '08:00:00'
+});
+$(".select2").select2({
+    placeholder : '请选择',
+});
+$("#return_task").click(function(){
+    window.location.href='/admin/schedule/monitoroff'
+});
+
+//$("#warning_send_time").Timepicker();
+
+$('#monitor_mode').change(function(){
+    if($(this).val() == '1'){
+        $('#finish_time_div').show();
+        $('#run_time_div').hide();
+    }else if($(this).val() == '2'){
+        $('#finish_time_div').hide();
+        $('#run_time_div').show();
+    }
+})
+
+$("#is_warning_custom").change(function(){
+    if($(this).val() == '1'){
+        $('#warning_send_time_div').hide();
+    }else if($(this).val()== '2'){
+        $('#warning_send_time_div').show();
+    }
+
+});
+
+
+
+$('#task_form').submit(function(){
+    project_id_val = $("#project_id").val();
+    // 项目不能为空
+    if($("#project_id").val() == '0'){
+        alert('请选择项目');
+        //$(".project_id_help").html('请选择项目');
+        return false;
+    }
+    // 项目和任务标识唯一验证
+    identification_name = $("#task_identification").val();
+
+})
+</script>
+{% endblock %}

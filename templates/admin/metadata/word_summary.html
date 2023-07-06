@@ -1,0 +1,545 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block title %} 词根汇总 | 元数据管理平台 {% endblock %}
+
+{% block content_title %} 词根汇总 {% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="/admin/metadata/hivesearch">元数据管理</a></li>
+    <li class="active">词根汇总</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <div class="col-md-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h4 class="box-title">
+                    词根信息
+                </h4>
+            </div>
+
+            <div class="box-body" style="line-height:30px;">
+
+                <table  width="800" class="table table-bordered table-hover dataTable">
+                  <thead>
+                  <tr>
+                      <th scope="col"><span>词条类目分类</span></th>
+                      <th scope="col"><span>词条中文名称</span></th>
+                      <th scope="col"><span>词条英文名称</span></th>
+                      <th scope="col"><span>词条缩写</span></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr>
+                      <td class="field">车辆</td>
+                      <td class="field">里程</td>
+                      <td class="field">mileage</td>
+                      <td class="field">mile</td>
+                    </tr>
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">运营</td>
+                      <td class="field">travel</td>
+                      <td class="field">travel</td>
+                    </tr>
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">运行</td>
+                      <td class="field">running</td>
+                      <td class="field">running</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">怠速</td>
+                      <td class="field">idle</td>
+                      <td class="field">idle</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">熄火</td>
+                      <td class="field">stop</td>
+                      <td class="field">stop</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">停留</td>
+                      <td class="field">stay</td>
+                      <td class="field">stay</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">油耗</td>
+                      <td class="field">oil</td>
+                      <td class="field">oil</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">速度</td>
+                      <td class="field">speed</td>
+                      <td class="field">speed</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">时长</td>
+                      <td class="field">duration</td>
+                      <td class="field">duration</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">距离</td>
+                      <td class="field">distance</td>
+                      <td class="field">distance</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">点</td>
+                      <td class="field">point</td>
+                      <td class="field">point</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">行程</td>
+                      <td class="field">trip</td>
+                      <td class="field">trip</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">位置</td>
+                      <td class="field">lc</td>
+                      <td class="field">lc</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">档位</td>
+                      <td class="field">gears</td>
+                      <td class="field">gears</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">滑行</td>
+                      <td class="field">sliding</td>
+                      <td class="field">sliding</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">巡航</td>
+                      <td class="field">cruise</td>
+                      <td class="field">cruise</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">时间</td>
+                      <td class="field">time</td>
+                      <td class="field">time</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">开始</td>
+                      <td class="field">start</td>
+                      <td class="field">start</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">结束</td>
+                      <td class="field">end</td>
+                      <td class="field">end</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">百公里</td>
+                      <td class="field">hundred</td>
+                      <td class="field">hundred</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">标记</td>
+                      <td class="field">tag</td>
+                      <td class="field">tag</td>
+                    </tr>
+
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">状态枚举</td>
+                      <td class="field">is</td>
+                      <td class="field">is</td>
+                    </tr>
+
+                    <tr>
+                      <td class="field"></td>
+                      <td class="field">异常</td>
+                      <td class="field">except</td>
+                      <td class="field">except</td>
+                    </tr>
+                     <tr>
+                      <td class="field"></td>
+                      <td class="field">最优</td>
+                      <td class="field">best</td>
+                      <td class="field">best</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">有效</td>
+                      <td class="field">valid</td>
+                      <td class="field">valid</td>
+                    </tr>
+
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">城市编码</td>
+                      <td class="field">citycode|city</td>
+                      <td class="field">city</td>
+                    </tr>
+
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">城市名称</td>
+                      <td class="field">cityname</td>
+                      <td class="field">cityname</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">省份编码</td>
+                      <td class="field">provcode|prov</td>
+                      <td class="field">prov</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">省份名称</td>
+                      <td class="field">provname</td>
+                      <td class="field">provname</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">区域编码</td>
+                      <td class="field">adminright|area</td>
+                      <td class="field">adminright|area</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">区域名称</td>
+                      <td class="field">areaname</td>
+                      <td class="field">areaname</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">托运</td>
+                      <td class="field">consign</td>
+                      <td class="field">consign</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">跨越</td>
+                      <td class="field">cross</td>
+                      <td class="field">cross</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">日期</td>
+                      <td class="field">pdt</td>
+                      <td class="field">pdt</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">选择</td>
+                      <td class="field">choose</td>
+                      <td class="field">choose</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">休眠</td>
+                      <td class="field">restt</td>
+                      <td class="field">rest</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">初始</td>
+                      <td class="field">first</td>
+                      <td class="field">first</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">最后</td>
+                      <td class="field">last</td>
+                      <td class="field">last</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">开始</td>
+                      <td class="field">start</td>
+                      <td class="field">start</td>
+
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">结束</td>
+                      <td class="field">end</td>
+                      <td class="field">end</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">线上</td>
+                      <td class="field">online</td>
+                      <td class="field">online</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">线下</td>
+                      <td class="field">offline</td>
+                      <td class="field">offline</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">仪表</td>
+                      <td class="field">meter</td>
+                      <td class="field">meter</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">电子控制器单元</td>
+                      <td class="field">Electronic Control Unit</td>
+                      <td class="field">ecu</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">终端号</td>
+                      <td class="field">terminalld</td>
+                      <td class="field">tid</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">差值</td>
+                      <td class="field">diffentvalue</td>
+                      <td class="field">diffvalue</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">经度</td>
+                      <td class="field">longitude</td>
+                      <td class="field">lng</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">纬度</td>
+                      <td class="field">latitude</td>
+                      <td class="field">lat</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">纠偏</td>
+                      <td class="field">Rectification</td>
+                      <td class="field">rect</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">高程</td>
+                      <td class="field">height</td>
+                      <td class="field">height</td>
+                    </tr>
+                  <tr>
+                      <td class="field">人\司机\用户</td>
+                      <td class="field">驾照</td>
+                      <td class="field">driving license</td>
+                      <td class="field">dl</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">行驶证</td>
+                      <td class="field">vehicle license</td>
+                      <td class="field">vl</td>
+                    </tr>
+                  <tr>
+                      <td class="field">货运过程</td>
+                      <td class="field">发</td>
+                      <td class="field">shipper</td>
+                      <td class="field">ship</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">取</td>
+                      <td class="field">pick</td>
+                      <td class="field">pick</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">送</td>
+                      <td class="field">deliver</td>
+                      <td class="field">deliver</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">收</td>
+                      <td class="field">receive</td>
+                      <td class="field">recv</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">物流</td>
+                      <td class="field">logistics</td>
+                      <td class="field">lots</td>
+                    </tr>
+                  <tr>
+                      <td class="field">运单</td>
+                      <td class="field">对账单</td>
+                      <td class="field">statement</td>
+                      <td class="field">stmt</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">附件</td>
+                      <td class="field">attachment</td>
+                      <td class="field">att</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">结算</td>
+                      <td class="field">settlement</td>
+                      <td class="field">stlmt</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">公司</td>
+                      <td class="field">company/enterprise</td>
+                      <td class="field">co</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">合同</td>
+                      <td class="field">agreement</td>
+                      <td class="field">agrmt</td>
+                  </tr>
+
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">序号</td>
+                      <td class="field">number</td>
+                      <td class="field">no</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">支付</td>
+                      <td class="field">payment</td>
+                      <td class="field">pmt</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">要求</td>
+                      <td class="field">require</td>
+                      <td class="field">req</td>
+                    </tr>
+
+                  <tr>
+                      <td class="field">结算单</td>
+                      <td class="field">金额</td>
+                      <td class="field">amount</td>
+                      <td class="field">amt</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">账号</td>
+                      <td class="field">account</td>
+                      <td class="field">acct</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">余额</td>
+                      <td class="field">balance</td>
+                      <td class="field">bal</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">代替</td>
+                      <td class="field">replace</td>
+                      <td class="field">rplc</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">手续</td>
+                      <td class="field">procedure</td>
+                      <td class="field">proc</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">渠道</td>
+                      <td class="field">channel</td>
+                      <td class="field">chnl</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">操作</td>
+                      <td class="field">operate</td>
+                      <td class="field">opt</td>
+                    </tr>
+                  <tr>
+                      <td class="field">聚合</td>
+                      <td class="field">累计</td>
+                      <td class="field">cumulative/count</td>
+                      <td class="field">cumu</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">加和</td>
+                      <td class="field">sum</td>
+                      <td class="field">sum</td>
+                    </tr>
+                  <tr>
+                      <td class="field"></td>
+                      <td class="field">平均</td>
+                      <td class="field">average</td>
+                      <td class="field">avg</td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+            </div>
+        </div>
+        </div>
+
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script>
+</script>
+{% endblock %}

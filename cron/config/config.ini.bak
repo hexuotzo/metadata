@@ -1,0 +1,13 @@
+[hive_db]
+host=
+user=
+passwd=
+db=
+port=3306
+
+[pg_db]
+host=
+user=
+passwd=
+db=
+port=5432

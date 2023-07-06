@@ -1,0 +1,364 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+&rsaquo; <a href="/admin/metadata/hivetableinfo/">元数据管理</a>
+&rsaquo; <a href="/hive/search">搜索</a> &rsaquo; {{ indexInfo.table_name }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+      <div class="row">
+
+        <div id="tab-container" class="tab-container">
+          <ul class='etabs'>
+            <li class='tab'><a href="#tabs1-basic">基本信息</a></li>
+            <li class='tab'><a href="#tabs1-field">字段信息</a></li>
+            <li class='tab'><a href="#tabs1-depend">血缘关系</a></li>
+            <li class='tab'><a href="#tabs1-use">使用信息</a></li>
+          </ul>
+          <div id="tabs1-basic">
+            <!-- content -->
+            <fieldset class="module aligned  module_0 initialized">
+
+                <div class="form-group field-depot_name">
+                    <div class="row">
+
+                        <label class="col-sm-2 control-label text-right">表id:</label>
+                        <div class="col-sm-7">
+                        {{ indexInfo.table_id }}
+                        <div class="help-block red"></div>
+                        </div>
+                    </div>
+
+                <div class="form-row">
+                        <div>
+                                <label>表名称:</label>
+                                <p>{{ indexInfo.table_name }}</p>
+                        </div>
+                </div>
+
+                <div class="form-row">
+                        <div>
+                                <label>数据库名称:</label>
+                                <p>{{ indexInfo.db_name }}</p>
+                        </div>
+                </div>
+                <div class="form-row">
+                        <div>
+                                <label>表类型:</label>
+                                <p>{{ tableInfo.tbl_type }}</p>
+                        </div>
+                </div>
+                <div class="form-row">
+                        <div>
+                                <label>表所有者:</label>
+                                <p>{{ tableInfo.tbl_owner }}</p>
+                        </div>
+                </div>
+
+                <div class="form-row">
+                        <div>
+                                <label>是否上线:</label>
+                                <p>{% if tableInfo.is_online == 1 %} 是 {% else %} 否  {% endif %}</p>
+                        </div>
+                </div>
+                <div class="form-row">
+                        <div>
+                                <label>存储地址:</label>
+                                <p>{{ tableInfo.location }}</p>
+                        </div>
+                </div>
+                <div class="form-row">
+                        <div>
+                                <label>分区字段:</label>
+                                <p>{{ tableInfo.partition }}</p>
+                        </div>
+                </div>
+                <div class="form-row">
+                        <div>
+                                <label>表创建时间:</label>
+                                <p>{{ tableInfo.create_time }}</p>
+                        </div>
+                </div>
+
+                <div class="form-row">
+                        <div>
+                                <label>表更新时间:</label>
+                                <p>{{ tableInfo.update_time }}</p>
+                        </div>
+                </div>
+                <div class="form-row">
+                        <div>
+                                <label>表注释:</label>
+                                <p>{{ indexInfo.table_content }}</p>
+                        </div>
+                </div>
+            </fieldset>
+
+          </div>
+          <div id="tabs1-field">
+            <!-- content -->
+            <fieldset class="module aligned  module_0 initialized">
+            <p>描述不全，去<a href='/column/column_list/?id={{ indexInfo.table_id }}' target="_blank">维护信息</a></p>
+            <table id="result_list" width="800">
+          <thead>
+          <tr>
+              <th scope="col"><span>id</span></th>
+              <th scope="col"><span>字段名称</span></th>
+              <th scope="col"><span>类型</span></th>
+              <th scope="col"><span>描述</span></th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for result in columnResult %}
+            <tr>
+              <td class="field">{{ result.column_idx }}</td>
+              <td class="field">{{ result.column_name }}</td>
+              <td class="field">{{ result.column_type }}</td>
+              <td class="field">{{ result.column_desc_maintain }}</td>
+            </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
+            </fieldset>
+          </div>
+          <div id="tabs1-depend">
+            <!-- content -->
+            <br />
+            <br />
+            <svg id="svg-canvas" width="100%" height="500"></svg>
+            <div class="dialogNew">
+            <ul></ul>
+            </div>
+          </div>
+
+          <div id="tabs1-use">
+            <!-- content -->
+            <fieldset class="module aligned  module_0 initialized">
+
+            <p>使用信息不全，去<a href='/admin/metadata/hivetablemaintain/{{maintainInfo.id}}/change/' target="_blank">完善信息</a></p>
+
+            {% if maintainInfo.usage_desc != None %}
+            <p>{{ maintainInfo.usage_desc }}</p>
+            {% endif %}
+            </fieldset>
+          </div>
+        </div>
+
+      </div>
+
+        <div class="submit-row">
+        <input type="button" value="返回搜索页" id="column_history" onclick="return_metadata()" />
+        </div>
+  </div>
+<style>
+
+.list_row{margin-bottom:15px; margin-top:15px;}
+
+.etabs { margin: 0; padding: 0; }
+.tab { display: inline-block; zoom:1; *display:inline;  border: solid 1px #999; border-bottom: none; -moz-border-radius: 4px 4px 0 0; -webkit-border-radius: 4px 4px 0 0; }
+.tab a { font-size: 14px; line-height: 2em; display: block; padding: 0 10px; outline: none; color:black }
+.tab a:hover { text-decoration: underline; }
+.tab.active { background: #fff; padding-top: 6px; position: relative; top: 1px; border-color: #666; }
+.tab a.active { font-weight: bold; color:black }
+.tab-container .panel-container { background: #fff; border: solid #666 1px; padding: 10px; -moz-border-radius: 0 4px 4px 4px; -webkit-border-radius: 0 4px 4px 4px; }
+
+g.type-current>rect {fill: #1E9FFF;}
+text {
+    font-weight: 300;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+    font-size: 14px;
+}
+.node rect {
+    stroke: #999;
+    fill: #fff;
+    stroke-width: 1.5px;
+}
+.edgePath path {
+    stroke: #333;
+    stroke-width: 1.5px;
+}
+ul,li{
+    margin: 0;
+    padding: 0;
+}
+.dialog{
+    display: none;
+    position: absolute;
+    z-index: 10;
+    margin-top: 40px;
+}
+.dialog ul{
+    background: #eee;
+    border: 1px solid #666;
+}
+.dialog li{
+    height: 30px;
+    line-height: 30px;
+    color: black;
+    padding: 0 10px;
+    list-style: none;
+    cursor: pointer;
+}
+
+</style>
+
+<script type="text/javascript" src="{% static "js/jquery.min.js" %}" ></script>
+<script>
+jQuery.browser={};(function(){jQuery.browser.msie=false; jQuery.browser.version=0;if(navigator.userAgent.match(/MSIE ([0-9]+)./)){ jQuery.browser.msie=true;jQuery.browser.version=RegExp.$1;}})();
+</script>
+<script type="text/javascript" src="{% static "js/jquery.hashchange.min.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/jquery.easytabs.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/dagre-d3.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/d3.v3.min.js" %}" ></script>
+
+
+
+<input type="hidden" id="dataflow_val" value="{{ dependArr }} " />
+
+<script>
+
+
+function return_metadata(){
+    window.location.href="/hive/search/"
+}
+</script>
+
+<script>
+    var dataFlow = $("#dataflow_val").val();
+    console.log(dataFlow)
+    var flowArr = eval('(' + dataFlow + ')');
+    console.log(typeof(flowArr));
+
+
+    var dataFlow = flowArr;
+
+    var active=''
+    // Create the input graph
+    var g = new dagreD3.graphlib.Graph()
+        .setGraph({})
+        .setDefaultEdgeLabel(function () { return {}; });
+
+    // 先设置node
+    for(var i in dataFlow){
+        flowValue = flowArr[i];
+        g.setNode(flowValue['id'],{
+            label:flowValue['label'],
+            class:"type-" + flowValue['status'],
+        });
+    }
+
+    console.log(g.nodes())
+    // 再划线展示关系
+    for(var j in dataFlow){
+        flowValue = flowArr[j];
+
+        if(flowValue['target'] && !flowValue['back_target']){
+            console.log(flowValue['label'])
+            g.setEdge(flowValue['id'],flowValue['target'],{})
+        }else{
+            console.log(flowValue['target']+'is null')
+        }
+    }
+
+    g.nodes().forEach(function (v) {
+        var node = g.node(v);
+        // Round the corners of the nodes
+        node.rx = node.ry = 5;
+    });
+
+    // Create the renderer
+    var render = new dagreD3.render();
+
+    // Set up an SVG group so that we can translate the final graph.
+    var svg = d3.select("svg"),
+        svgGroup = svg.append("g");
+
+    // Run the renderer. This is what draws the final graph.
+    render(d3.select("svg g"), g);
+
+    var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
+    svgGroup.attr("transform", "translate(" + 20 + ", 20)");
+    svg.attr("height", g.graph().height + 40);
+    // 增加事件
+
+    var view = {
+        'label': 'docs',
+        'onClick': function() { console.log('clicked ' + this.label); }
+     };
+
+     var drag = d3.behavior.drag().on("drag", dragmove);
+
+     function dragmove(d){
+         console.log(d3.select(this).attr("transform"))
+         xy = d3.select("svg g").attr("transform").replace('translate(', '').replace(')', '').split(',')
+         xy[0] = parseFloat(xy[0]) + d3.event.dx
+         xy[1] = parseFloat(xy[1]) + d3.event.dy
+         d3.select("svg g").attr("transform", "translate(" +xy[0] +"," + xy[1]+")");
+     }
+
+    //_.bindAll(view);
+    svgGroup.selectAll("g.node").on('click', function (v) {
+        // //显示提示信息方案一：更新提示条位置和值
+        // d3.select("#tooltip")
+        //     .attr("style", "left:" + g.node(v).x + "px" + ";top:" + g.node(v).y + "px")
+        //     .select("#tooltip_value")
+        //     .text("规则描述：" + g.node(v).description);
+        // //显示提示条
+        // d3.select("#tooltip").classed("hidden", false);
+        console.log(v)
+        console.log(g.node(v).label)
+
+        //显示提示信息方案二：
+        // d3.select(this).attr("fill", "#f34848").append("title").text(function (d) {
+        //     return "规则描述：" + g.node(v).description;
+        // }).attr("id", "tooltip");
+    }).call(drag);
+
+    $(".node").on('click', function (e) {
+        var offset=$(this).offset()
+        active=$(this).find('tspan').text()
+        $('.dialog ul').html(`<li>操作1</li><li>操作2</li><li>操作3</li>`)
+        $('.dialog').css({'left':offset.left+'px','top':offset.top+'px','width':$(this).find('.label-container').width()+'px'}).show()
+    });
+
+    $(".dialog").on('mouseleave', function (e) {
+        $('.dialog').hide()
+    });
+    $('.dialog').on('click',"li", function (e) {
+        idx=$(this).index()
+        if(idx==0){
+            alert(`操作1 ${active}`)
+        }else if(idx==1){
+            alert(`操作2 ${active}`)
+        }else if(idx==2){
+            alert(`操作3 ${active}`)
+        }
+    });
+    $('#tab-container').easytabs();
+</script>
+
+
+{% endblock %}
+
+
+
+

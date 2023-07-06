@@ -1,0 +1,112 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block title %} 元数据搜索 | 元数据管理平台 {% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% block content_title %} 元数据搜索 {% endblock %}
+
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="javascript:void(0)">元数据管理</a></li>
+    <li class="active">搜索</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="box box-primary">
+
+    <div class="box-body" style="padding-left:15px;">
+      <form method='GET' class="form-inline">
+      <div class="form-group">
+        <input type="text" name="search_key" id="search_key" placeholder="输入表名或描述信息" class="form-control" value="{{ searchKey }}" size="100px" id="search_key" />
+      </div>
+        <div class="form-group">
+            <input type="button" name="search_sub" onclick="sub_search();" id="search_button" class="btn btn-primary" value=" 搜 索 " />{{ search_key }}
+            <a href="/admin/metadata/dict" style="vertical-align: bottom;">返回首页</a>
+        </div>
+      </form>
+    </div>
+
+
+    <div class="box-body">
+     {% if contacts %}
+
+          {% for result in contacts %}
+          <div class="row list_row">
+            <div class="row">
+              <a href="{{ result.url }}" target="_blank"><strong>表名</strong>：{{ result.table_name|safe}}</a>
+            </div>
+            <div class="row">
+              <strong>库名</strong>：{{ result.db_name}} <strong>表描述</strong>：{{ result.table_content|safe}}
+            </div>
+            <div class="row result_row">
+            <strong>列描述</strong>：{{result.column_content|safe}}
+            </div>
+            <div class="row result_row">
+           <strong>列字段</strong>：{{result.column_names|safe}}
+            </div>
+
+          </div>
+          {% endfor %}
+
+      {% else %}
+          <div class="row list_row">
+            没有查找到相关记录,可以试试换个条件
+          </div>
+      {% endif %}
+
+
+    {% if contacts %}
+       <div class="pagination">
+            <span class="step-links">
+                {% if contacts.has_previous %}
+                    <a href="?search_key={{searchKey}}&page={{ contacts.previous_page_number }}">上一页</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+                </span>
+
+                {% if contacts.has_next %}
+                    <a href="?search_key={{searchKey}}&page={{ contacts.next_page_number }}">下一页</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endif %}
+
+        <div class="submit-row">
+        <!-- <input type="button" value="返回" id="column_history" onclick="return_metadata()" />-->
+        </div>
+
+    </div>
+    </div>
+    <br class="clear">
+  </div>
+<style>
+
+  .list_row{margin-bottom:15px; margin-left:20px;}
+  .result_row{width:900px; word-wrap:break-word;}
+</style>
+
+<script>
+function sub_search(){
+    var search_key=document.getElementById("search_key").value
+    console.log(search_key)
+    window.location.href="/admin/metadata/hivesearch/?search_key=" + search_key;
+
+}
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block title %} 表资产信息 | 元数据管理平台 {% endblock %}
+
+{% block content_title %} 表资产信息 {% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="/admin/metadata/hivesearch">元数据管理</a></li>
+    <li class="active">表资产信息</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <div class="col-lg-6 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-aqua">
+            <div class="inner">
+              <h3>{{ table_dict.cnt }}</h3>
+
+              <p>总表个数</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-document"></i>
+            </div>
+<!--            <a href="/admin/metadata/qualityrule/" class="small-box-footer">查看详情 <i class="fa fa-arrow-circle-right"></i></a>-->
+          </div>
+        </div>
+
+        <div class="col-lg-6 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3>{{ table_dict.yesterday_cnt }}</h3>
+
+              <p>昨日新增表个数</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-document"></i>
+            </div>
+<!--            <a href="/admin/metadata/qualityrule/" class="small-box-footer">查看详情 <i class="fa fa-arrow-circle-right"></i></a>-->
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">表存储趋势</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+              <div class="chart">
+                <canvas id="lineChart" style="height: 384px; width: 555px;"></canvas>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+        </div>
+            <input type="hidden" id="lineDataX" value="{{ lineDataX }}" />
+            <input type="hidden" id="lineDataY" value="{{ lineDataY }}" />
+            <input type="hidden" id="lineDataZ" value="{{ lineDataZ }}" />
+
+            <input type="hidden" id="unit" value="{{ unit }}" />
+
+
+        <div class="col-md-6">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">表存储排行</h3>
+
+              <div class="box-tools pull-right">
+                    <a href="/admin/metadata/userorgtable/" target="_blank" style="font-weight: bold;"><<< 查看更多</a>
+              </div>
+            </div>
+            <div class="box-body">
+                <ul class="panel-ul">
+                    {% for rank in rank_list %}
+                    <li class="panel-list">
+                        <small class="label pull-left bg-red">{{ rank.key}}</small> &nbsp;
+                        <a href="/admin/metadata/detail/?db_name={{ rank.db_name }}&table_name={{ rank.tbl_name }}" target="_blank"> {{ rank.db_name }}.{{ rank.tbl_name }}</a>
+                        - {{ rank.format_storage }}
+                    </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">新增表趋势</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+              <div class="chart">
+                <canvas id="tableNumChart" style="height: 396px; width: 555px;"></canvas>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+        </div>
+            <input type="hidden" id="tableDataX" value="{{ tableDataX }}" />
+            <input type="hidden" id="tableDataY" value="{{ tableDataY }}" />
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<style type="text/css">
+     .panel-list{
+            position: relative;
+            display: block;
+            padding-top: 5px;
+     }
+    .panel-ul{
+        padding-left: 5px;
+    }
+</style>
+
+<script type="text/javascript" src="{% static "js/chart.js" %}"></script>
+
+<script>
+// 表存储趋势
+const ctx = document.getElementById('lineChart').getContext('2d');
+
+// eval('(' + dataFlow + ')')
+var dataX = $("#lineDataX").val();
+var dataY = $("#lineDataY").val();
+var dataZ = $("#lineDataZ").val();
+
+var unit = $("#unit").val()
+
+console.log(dataX)
+console.log(dataY)
+var lineDataX = dataX.split(',').reverse()
+var lineDataY = dataY.split(',').reverse()
+var lineDataZ = dataZ.split(',').reverse()
+
+const labels = lineDataX;
+const dataStorageData = {
+  labels: labels,
+  datasets: [{
+    label: '表存储('+unit+')',
+    data: lineDataY,
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  },{
+    label: 'top10表存储',
+    data: lineDataZ,
+    fill: false,
+    borderColor: 'skyblue',
+    tension: 0.1
+  }]
+};
+
+const myChart = new Chart(ctx, {
+    type: 'line',
+    data: dataStorageData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// 新增表个数趋势
+const tableNumChart = document.getElementById('tableNumChart').getContext('2d');
+var tableX = $("#tableDataX").val();
+var tableY = $("#tableDataY").val();
+
+var tableDataX = tableX.split(',').reverse()
+var tableDataY = tableY.split(',').reverse()
+
+
+const tableLabels = tableDataX;
+const tableDataStorageData = {
+  labels: tableLabels,
+  datasets: [{
+    label: '新增表个数',
+    data: tableDataY,
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  }]
+};
+
+const tableChart = new Chart(tableNumChart, {
+    type: 'line',
+    data: tableDataStorageData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+</script>
+{% endblock %}

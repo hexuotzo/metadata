@@ -1,0 +1,101 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block title %} 数据表规范 | 元数据管理平台 {% endblock %}
+
+{% block content_title %} 数据表规范 {% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="/admin/metadata/hivesearch">元数据管理</a></li>
+    <li class="active">数据表规范</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <div class="col-md-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h4 class="box-title">
+                    数据表规范说明
+                </h4>
+            </div>
+
+            <div class="box-body" style="line-height:30px;">
+                <h3>命名</h3>
+                <p>所有数据库对象名称均使用26个字母，下划线或数字来命名，并不得以下划线、数字开头。</p>
+
+                命名格式：</br>
+                [层级]_[业务分类(位置云、寰游等)]_[表内容]_[表规则/周期分类(日、周、月)] </br>
+
+                名次解释：<br/>
+                - 层级：数据仓库的分层，例如：ODS（对应数据接入层）、DWD（对应明细数据层）、DWS（对应轻度汇总层）、ADS（对应应用数据层）等，详细参看分层定义；<br/>
+                - 业务分类（英文）：强制要求，详细参看数据仓库业务分类定义章节；<br/>
+                - 表内容：强制要求，要求在满足不同数据库命名原则的前提下，尽量详尽说明表的具体数据内容；<br/>
+                - 分表规则：用来说明表的划分原则，详细参见周期分类定义章节；<br/>
+
+                周期分类<br/>
+                物理模型表的后缀英文表示为_XXX（日期可选）：<br/>
+                - 第一位X表示表数据存储粒度（分区表、非分区表），分区表P（partition），非分区表S（single）。Hive仓库中使用的主要是分区表。<br/>
+                - 第二位X表示按某个周期处理数据（年、季、月、旬、周、日、小时），按年处理是Y（Year），按季处理是Q（Quarter），按月处理是M（month），按周处理是W（Week），按日处理是D（Day），按日处理是H（hour）。<br/>
+                - 第三位X表示保存多份、单份或者是从起始直到当日的处理，其中F（full）表示当前存储为全量数据； I（Increase）表示数据保存单份的增量数据； T（Till）为起始到当日；C（chain）为拉链表.<br/>
+
+                <h3>分区</h3>
+                分区表的命名见周期分类
+
+
+                <h3>建表格式</h3>
+                Hive中常用的建表语句我们根据情况推荐使用，text, orc+snappy，parquet+snappy三种<br/>
+                在这里有一点需要注意，在建表时必须指定location的位置，必须放到相应的存储中。<br/>
+                - ODS层涉及对象存储的，推荐使用parquet+snappy 方式，其他均采用orc+snappy<br/>
+                - DWD与DWS均采用 orc+snappy<br/>
+                - 维度表等直接默认text方式即可。<br/>
+
+                    建表示例<br/>
+                    <pre>
+#text表
+create table test.dim_city_info (
+    id int comment 'id',
+    name string comment '名称'
+) comment '表名'
+row format delimited fields terminated by '\t'
+lines terminated by '\n'
+STORED AS TEXTFILE
+location 'hdfs://kaxingzheha/apps/hive/warehouse/test.db/dim_city_info';
+
+# orc+ snappy表
+create table test.dim_city_info (
+    id int  comment 'id',
+    name string comment '名称'
+) comment '表名'
+STORED AS ORC TBLPROPERTIES ("orc.compression"="SNAPPY");
+
+# parquet+snappy表
+create table test.dim_city_info (
+    id int comment 'id',
+    name string comment '名称'
+) comment '表名'
+STORED AS PARQUET TBLPROPERTIES ("parquet.compression"="SNAPPY");
+                        </pre>
+
+            </div>
+        </div>
+        </div>
+
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+<script>
+</script>
+{% endblock %}

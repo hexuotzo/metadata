@@ -1,0 +1,325 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
+  {% if cl.formset %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+  {% endif %}
+  {% if cl.formset or action_form %}
+    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+  {% endif %}
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
+
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="/admin/metadata/hivetableinfo/">元数据管理</a>
+&rsaquo; 血缘关系展示
+</div>
+{% endblock %}
+{% endif %}
+
+{% block coltype %}flex{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+      <div class="row">
+          <svg id="svg-canvas" width="100%" height=1000></svg>
+        <div class="dialog">
+            <ul>
+
+            </ul>
+        </div>
+
+      </div>
+
+
+        <div class="submit-row">
+<!--            <a href="/admin/metadata/hivetableinfo/">返回元数据管理列表</a>-->
+          <input type="button" value="返回" id="column_history" onclick="return_metadata()" />
+        </div>
+  </div>
+<style>
+        body{
+            margin: 0;
+        }
+        g.type-current>rect {
+            fill: #1E9FFF;
+        }
+
+        /*g.type-success>rect {*/
+            /*fill: green;*/
+        /*}*/
+
+        /*g.type-fail>rect {*/
+            /*fill: red;*/
+        /*}*/
+
+        text {
+            font-weight: 300;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+            font-size: 14px;
+        }
+
+        .node rect {
+            stroke: #999;
+            fill: #fff;
+            stroke-width: 1.5px;
+        }
+
+        .edgePath path {
+            stroke: #333;
+            stroke-width: 1.5px;
+        }
+        ul,li{
+            margin: 0;
+            padding: 0;
+        }
+        .dialog{
+            display: none;
+            position: absolute;
+            z-index: 10;
+            margin-top: 40px;
+        }
+        .dialog ul{
+            background: #eee;
+            border: 1px solid #666;
+        }
+        .dialog li{
+            height: 30px;
+            line-height: 30px;
+            color: black;
+            padding: 0 10px;
+            list-style: none;
+            cursor: pointer;
+        }
+
+    </style>
+<script type="text/javascript" src="{% static "js/jquery.min.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/dagre-d3.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/d3.v3.min.js" %}" ></script>
+
+<input type="hidden" id="dataflow_val" value="{{ dependArr }} " />
+<script>
+function return_metadata(){
+    window.location.href="/admin/metadata/hivetableinfo/"
+}
+</script>
+
+<script>
+    var dataFlow = $("#dataflow_val").val();
+    console.log(dataFlow)
+    var flowArr = eval('(' + dataFlow + ')');
+    console.log(typeof(flowArr));
+
+
+
+    var dataFlow = flowArr;
+
+
+
+    var dataFlowOld = [{
+        id: 1,
+        label: 'app_base_idletime_pdi',
+        status: 'success',
+        target: null,
+        back_target:null
+    },{
+        id: 2,
+        label: 'app_base_choose_pdi',
+        status: 'success',
+        target: 1,
+        back_target:null
+    },{
+        id: 3,
+        label: 'dws_base_idletime0200_pdi',
+        status: 'success',
+        target: 1,
+        back_target:null
+    },{
+        id: 4,
+        label: 'dws_base_idletime0f37_pdi',
+        status: 'success',
+        target: 1,
+        back_target: null
+    },
+    {
+        id: 5,
+        label: 'dws_base_idletime0f37_pdi',
+        status: 'success',
+        target: 1,
+        back_target: null
+    },
+    {
+        id: 6,
+        label: 'dws_base_idletime0f37_pdi',
+        status: 'success',
+        target: 1,
+        back_target: null
+    },
+    {
+        id: 7,
+        label: 'dws_base_idletime0f37_pdi',
+        status: 'success',
+        target: 1,
+        back_target: null
+    },
+    {
+        id: 8,
+        label: 'dws_base_idletime0f37_pdi',
+        status: 'success',
+        target: 1,
+        back_target: null
+    },
+    {
+        id: 9,
+        label: 'dws_base_idletime0f37_pdi',
+        status: 'success',
+        target: 2,
+        back_target: null
+    },
+    {
+        id: 10,
+        label: 'dws_base_idletime0f37_pdi',
+        status: 'success',
+        target: 2,
+        back_target: null
+    }
+    ]
+    var active=''
+    // Create the input graph
+    var g = new dagreD3.graphlib.Graph()
+        .setGraph({})
+        .setDefaultEdgeLabel(function () { return {}; });
+
+    // 先设置node
+    for(var i in dataFlow){
+        flowValue = flowArr[i];
+        g.setNode(flowValue['id'],{
+            label:flowValue['label'],
+            class:"type-" + flowValue['status'],
+        });
+    }
+    // 再划线展示关系
+    for(var i in dataFlow){
+        flowValue = flowArr[i];
+        if(flowValue['target'] && !flowValue['back_target']){
+            g.setEdge(flowValue['id'],flowValue['target'],{})
+        }
+    }
+
+    /*
+    dataFlow && dataFlow.map((item, i) =>{
+        g.setNode(item.id, {
+            label: item.label,
+            class: "type-" + item.status,
+            // id: "status" + i
+        });
+        // Set up edges, no special attributes.
+        if(item.target && !item.back_target) {
+            g.setEdge(item.id,item.target, {})
+        }else if(item.back_target) {
+            console.log(1111111)
+            g.setEdge(item.id,item.target, {})
+            g.setEdge(item.id,item.back_target, {})
+        }
+    })*/
+
+    g.nodes().forEach(function (v) {
+        var node = g.node(v);
+        // Round the corners of the nodes
+        node.rx = node.ry = 5;
+    });
+
+    // Create the renderer
+    var render = new dagreD3.render();
+
+    // Set up an SVG group so that we can translate the final graph.
+    var svg = d3.select("svg"),
+        svgGroup = svg.append("g");
+
+    // Run the renderer. This is what draws the final graph.
+    render(d3.select("svg g"), g);
+
+    var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
+    svgGroup.attr("transform", "translate(" + 20 + ", 20)");
+    svg.attr("height", g.graph().height + 40);
+    // 增加事件
+
+    var view = {
+        'label': 'docs',
+        'onClick': function() { console.log('clicked ' + this.label); }
+     };
+
+     var drag = d3.behavior.drag().on("drag", dragmove);
+
+     function dragmove(d){
+         console.log(d3.select(this).attr("transform"))
+         xy = d3.select("svg g").attr("transform").replace('translate(', '').replace(')', '').split(',')
+         xy[0] = parseFloat(xy[0]) + d3.event.dx
+         xy[1] = parseFloat(xy[1]) + d3.event.dy
+         d3.select("svg g").attr("transform", "translate(" +xy[0] +"," + xy[1]+")");
+     }
+
+    //_.bindAll(view);
+    svgGroup.selectAll("g.node").on('click', function (v) {
+        // //显示提示信息方案一：更新提示条位置和值
+        // d3.select("#tooltip")
+        //     .attr("style", "left:" + g.node(v).x + "px" + ";top:" + g.node(v).y + "px")
+        //     .select("#tooltip_value")
+        //     .text("规则描述：" + g.node(v).description);
+        // //显示提示条
+        // d3.select("#tooltip").classed("hidden", false);
+        console.log(v)
+        console.log(g.node(v).label)
+
+        //显示提示信息方案二：
+        // d3.select(this).attr("fill", "#f34848").append("title").text(function (d) {
+        //     return "规则描述：" + g.node(v).description;
+        // }).attr("id", "tooltip");
+    }).call(drag);
+
+    $(".node").on('click', function (e) {
+        var offset=$(this).offset()
+        active=$(this).find('tspan').text()
+        $('.dialog ul').html(`<li>操作1</li><li>操作2</li><li>操作3</li>`)
+        $('.dialog').css({'left':offset.left+'px','top':offset.top+'px','width':$(this).find('.label-container').width()+'px'}).show()
+    });
+    $(".dialog").on('mouseleave', function (e) {
+        $('.dialog').hide()
+    });
+    $('.dialog').on('click',"li", function (e) {
+        idx=$(this).index()
+        if(idx==0){
+            alert(`操作1 ${active}`)
+        }else if(idx==1){
+            alert(`操作2 ${active}`)
+        }else if(idx==2){
+            alert(`操作3 ${active}`)
+        }
+    });
+</script>
+{% endblock %}
+
+
+
+

@@ -1,0 +1,466 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <form action="" method="post" id="quality_form">
+            {% csrf_token %}
+        <div class="col-md-9">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        质量规则添加
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">规则名称</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="rule_name" class="vTextField" maxlength="100" required="" id="rule_name">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">规则类型</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="rule_type" id="rule_type">
+                                    <option value="1">表级规则</option>
+                                    <option value="2">字段级规则</option>
+                                    <option value="3">自定义SQL</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_db_table" style="line-height:35px;">
+                            <label class="col-sm-2 control-label text-right">选定内容</label>
+                            <div class="col-sm-10">
+                                    <span class="text-red" style="margin-left: -10px;">* </span>
+                                    <select name="db_name" id="db_name">
+                                        <option value="0" selected>请选择数据库</option>
+                                        {% for db in db_all %}
+                                        <option value="{{db.db_name}}">{{db.db_name}}</option>
+                                        {% endfor %}
+                                    </select> &nbsp;&nbsp;
+                                    <span id="div_table_name">
+                                    <select name="table_name" id="table_name">
+                                        <option value="0" selected>请选择表</option>
+                                    </select>
+                                    </span>&nbsp;&nbsp;
+                                    <span id="div_column_name" style="display:none; line-height:45px">
+                                    <select name="column_name" id="column_name">
+                                        <option value="0">请选择列</option>
+                                    </select>
+                                    </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">采样方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="sampling_mode" id="sampling_mode">
+                                    <option value="mode_count">count</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_filter_condition">
+                            <label class="col-sm-2 control-label text-right">过滤条件</label>
+                            <div class="col-sm-7">
+                                <textarea name="filter_condition" cols="40" rows="3" class=""></textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red">日期使用pdt={yesterday}的格式</div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_custom_sql" style="display:none;">
+                            <label class="col-sm-2 control-label text-right">自定义sql</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <textarea name="custom_sql" id="custom_sql" cols="40" rows="6" class="vLargeTextField"></textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">校验类型</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="check_type" id="check_type">
+                                    <option value="1">数值型</option>
+                                    <option value="2">波动率型</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">校验方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="check_mode" id="check_mode">
+                                    <option value="1">与固定值比较</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">比较方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="compare_mode" id="compare_mode">
+                                    <option value="gt"> > </option>
+                                    <option value="gte"> >= </option>
+                                    <option value="lt"> < </option>
+                                    <option value="lte"> <= </option>
+                                    <option value="equal"> = </option>
+                                    <option value="nequal"> != </option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_excepted_value">
+                            <label class="col-sm-2 control-label text-right">期望值</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="number" name="excepted_value" value="0"  step="any" />
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="div_percent" style="display:none">
+                            <label class="col-sm-2 control-label text-right">波动值</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="number" name="percent_min" value="0"  step="any" /> %
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">规则描述</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <textarea name="rule_desc" cols="40" rows="3" class="" required=""></textarea>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">报警方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="warning_mode">
+                                    <option value="1">邮件</option>
+<!--                                    <option value="2">短信</option>-->
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">报警接收人</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="warning_receiver" class="vTextField" maxlength="100" required="" id="warning_receiver">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red">多个接收人以;号分割</div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">状态</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="status" id="status">
+                                    <option value="on" >上线</option>
+                                    <option value="off">下线</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-sm-2 control-label text-right">执行方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="execute_type" id="execute_type">
+                                    <option value="1">系统统一执行</option>
+                                    <option value="2">自定义时间执行</option>
+                                </select>
+                                &nbsp;&nbsp;
+                                <span id="execute_div" style="display:none">
+                                <input type="text" name="execute_hour" value="09:00" size="15" style="height:34px;font-size:14px;">
+                                </span>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 hidden-sm hidden-xs">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        操作面板
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <input type="submit" value="保存" class="btn btn-primary form-control" name="_save">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="button" value="返回规则列表" id="return_quality" class="btn btn-primary form-control" name="_save">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    function ajax_get_table_name(){
+        db_value = $("#db_name").val();
+
+        $.ajax({
+                type:"GET",
+                url:" /ajax/get_table_name?db_name=" + db_value,
+                dataType:"json",
+                success:function(res){
+                    if(res.success=='ok'){
+                        table_html = '<option value="0" selected>请选择表</option>'
+                        $.each(res.data,function(index,value){
+                             table_html += '<option value="'+value.table_name+'">'+value.table_name+'</option>'
+                             //console.log(value.table_name)
+                        });
+                        //console.log(table_html)
+                        $("#table_name").html(table_html)
+                    }else{
+                        console.log('error!')
+                    }
+                }
+            });
+    }
+
+    function ajax_get_column_name(){
+        db_value = $("#db_name").val();
+        table_value = $("#table_name").val();
+
+        $.ajax({
+                type:"GET",
+                url:"/ajax/get_column_name?db_name="+db_value+"&table_name=" + table_value,
+                dataType:"json",
+                success:function(res){
+                    if(res.success=='ok'){
+                        column_html = '<option value="0" selected>请选择列</option>'
+                        $.each(res.data,function(index,value){
+                             column_html += '<option value="'+value.column_name+'">'+value.column_name+'</option>'
+
+                             //console.log(value.table_name)
+                        });
+
+                        //console.log(column_html)
+                        $("#column_name").html(column_html)
+                    }else{
+                        console.log('error!')
+                    }
+                }
+            });
+    }
+
+    // 设置规则类型选项切换，自定义sql的展示，表级和列级的展示
+    $("#rule_type").change(function(){
+        console.log($(this).val())
+        rule_type = $(this).val()
+        if(rule_type == 3){
+            $("#div_custom_sql").show()
+            $("#div_filter_condition").hide()
+            $("#div_db_table").hide()
+            $("#div_column_name").hide()
+
+            $("#sampling_mode").html('<option value="mode_custom">自定义SQL</option>')
+        }else if(rule_type==2) {
+            $("#div_custom_sql").hide()
+            $("#div_filter_condition").show()
+            $("#div_db_table").show()
+            $("#div_column_name").show()
+            $("#sampling_mode").html('<option value="mode_sum">sum</option>'+
+                                    '<option value="mode_avg">avg</option>'+
+                                    '<option value="mode_max">max</option>'+
+                                    '<option value="mode_min">min</option>'+
+                                    '<option value="mode_null">空值</option>'+
+                                    '<option value="mode_zero">0值</option>'+
+                                    '<option value="mode_repeat">重复值</option>')
+
+            ajax_get_column_name();
+        }else {
+            $("#div_custom_sql").hide()
+            $("#div_filter_condition").show()
+            $("#div_db_table").show()
+            $("#div_column_name").hide()
+
+            $("#sampling_mode").html('<option value="mode_count">count</option>')
+
+        }
+    })
+
+    //ajax_get_table_name();
+    //ajax_get_column_name();
+
+    // 库名切换，选择表名
+    $("#db_name").change(function(){
+        ajax_get_table_name();
+        console.log('db_name change')
+        //$("#column_name").html('<option value="0">请选择</option>)
+    });
+    $("#table_name").change(function(){
+        ajax_get_column_name();
+    });
+
+    // 校验类型切换
+    $("#check_type").change(function(){
+        check_type_val = $(this).val();
+        if(check_type_val == 1){
+            $("#check_mode").html('<option value="1">与固定值比较</option>');
+            $("#compare_mode").html('<option value="gt"> > </option>'+
+                                    '<option value="gte"> >= </option>'+
+                                    '<option value="lt"> < </option>'+
+                                    '<option value="lte"> <= </option>'+
+                                    '<option value="equal"> = </option>'+
+                                    '<option value="nequal"> != </option>');
+            $("#div_excepted_value").show();
+            $("#div_percent").hide();
+        }else{
+            $("#check_mode").html('<option value="2">与昨天对比</option>'+
+                                    '<option value="3">7天平均值对比</option>'+
+                                    '<option value="4">30天平均值对比</option>');
+            $("#compare_mode").html('<option value="rise"> 上升 </option>'+
+                                    '<option value="decline"> 下降 </option>'+
+                                    '<option value="abs"> 绝对值 </option>');
+            $("#div_excepted_value").hide();
+            $("#div_percent").show();
+        }
+    });
+
+    $("#execute_type").change(function(){
+        execute_type_val = $(this).val();
+        if(execute_type_val == 2){
+            $("#execute_div").show();
+        }else{
+            $("#execute_div").hide();
+        }
+    });
+
+    $("#return_quality").click(function(){
+        window.location.href='/admin/metadata/qualityrule'
+    });
+
+    $('#quality_form').submit(function(){
+        //alert('eee');
+
+        rule_type = $('#rule_type').val()
+        // 判断选定库和表的内容是否有
+        if(rule_type == '1' || rule_type=='2'){
+            if($('#db_name').val() == '0'){
+                alert('请选择数据库');
+                return false;
+            }
+
+            if($('#table_name').val() == '0'){
+                alert('请选择表');
+                return false;
+            }
+        }
+        // 判断列有没有选择字段
+        if(rule_type == '2'){
+            if($('#column_name').val() == '0'){
+                alert('请选择列');
+                return false;
+            }
+        }
+        // 判断sql有没有值
+        if(rule_type == '3'){
+           if($('#custom_sql').val() == '0'){
+                alert('请填写sql');
+                return false;
+            }
+        }
+    });
+</script>
+{% endblock %}

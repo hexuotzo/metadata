@@ -1,0 +1,179 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block title %} 用户资产信息 | 元数据管理平台 {% endblock %}
+
+{% block content_title %} 用户资产信息 {% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="/admin/metadata/hivesearch">元数据管理</a></li>
+    <li class="active">用户资产信息</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+        <br />
+        <form class="form-horizontal">
+        <div class="form-group">
+            <label for="org_id" class="col-sm-1 control-label">组织</label>
+            <div class="col-sm-4">
+                <select name="org_id" id="org_id" class="form-control">
+                    <option value="-1">全部</option>
+                    {% for org in org_info %}
+                    <option value="{{ org.id }}" {% ifequal org_id org.id %} selected="selected" {% endifequal %}>{{ org.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <label for="tbl_owner" class="col-sm-1 control-label">集群用户</label>
+            <div class="col-sm-4">
+                <select name="tbl_owner" id="tbl_owner" class="form-control">
+                    <option value="all">全部</option>
+                    {% for owner in owner_info %}
+                    <option value="{{ owner.tbl_owner }}" {% ifequal tbl_owner owner.tbl_owner %} selected="selected" {% endifequal %}>{{ owner.tbl_owner }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        </form>
+
+        <div class="col-lg-4 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-navy">
+            <div class="inner">
+              <h3>{{ user_storage }} </h3>
+
+              <p>存储大小</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-document"></i>
+            </div>
+            <a href="#" class="small-box-footer">&nbsp;</a>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-aqua">
+            <div class="inner">
+              <h3>{{ table_total.cnt }} </h3>
+
+              <p>总表个数</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-document"></i>
+            </div>
+            <a href="/admin/metadata/userorgtable/?tbl_owner={{ tbl_owner }}" target="_blank" class="small-box-footer">查看明细 <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+
+
+        <div class="col-lg-4 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-teal">
+            <div class="inner">
+              <h3>{{ table_total.yesterday_cnt }} </h3>
+
+              <p>昨日新增表个数</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-document"></i>
+            </div>
+            <a href="#" class="small-box-footer bg-teal">&nbsp;</a>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">表存储趋势</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+              <div class="chart">
+                <canvas id="lineChart" style="height: 396px; width: 555px;"></canvas>
+              </div>
+            </div>
+            <!-- /.box-body -->
+          </div>
+        </div>
+        <input type="hidden" id="lineDataX" value="{{ lineDataX }}" />
+        <input type="hidden" id="lineDataY" value="{{ lineDataY }}" />
+        <input type="hidden" id="storageUnit" value="{{ unit }}" />
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript" src="{% static "js/chart.js" %}"></script>
+<script>
+$("#tbl_owner").change(function(){
+    // alert($("#tbl_owner").val())
+    ownerVal = $("#tbl_owner").val()
+    org_id = $("#org_id").val()
+    window.location.href='/admin/metadata/userstorage/?tbl_owner='+ownerVal+'&org_id='+org_id
+})
+
+$("#org_id").change(function(){
+    org_id = $("#org_id").val()
+    ownerVal = $("#tbl_owner").val()
+    window.location.href='/admin/metadata/userstorage/?tbl_owner='+ownerVal+'&org_id='+org_id
+})
+
+
+
+
+
+// 表存储趋势
+const ctx = document.getElementById('lineChart').getContext('2d');
+
+var unit = $("#storageUnit").val()
+// eval('(' + dataFlow + ')')
+var dataX = $("#lineDataX").val();
+var dataY = $("#lineDataY").val();
+
+console.log(dataX)
+console.log(dataY)
+var lineDataX = dataX.split(',').reverse()
+var lineDataY = dataY.split(',').reverse()
+
+const labels = lineDataX;
+const dataStorageData = {
+  labels: labels,
+  datasets: [{
+    label: '表存储('+unit+')',
+    data: lineDataY,
+    fill: false,
+    borderColor: 'Orange',
+    backgroundColor: 'Orange',
+    tension: 0.1
+  }]
+};
+
+const myChart = new Chart(ctx, {
+    type: 'line',
+    data: dataStorageData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

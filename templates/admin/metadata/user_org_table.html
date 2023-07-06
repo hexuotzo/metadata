@@ -1,0 +1,167 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block title %} 存储空间列表 | 元数据管理平台 {% endblock %}
+
+{% block content_title %} 存储空间列表 {% endblock %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="/admin/metadata/hivesearch">元数据管理</a></li>
+    <li class="active">存储空间列表</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+    <div class="box box-primary">
+            <div class="box-header with-border">
+                <h4 class="box-title">
+                    &nbsp;
+                </h4>
+            </div>
+
+            <div class="box-body">
+                <div id="content-main">
+                    <div class="module filtered" id="changelist">
+                        <div class="row" style="margin-bottom: 15px;">
+
+                            <div class="col-md-10 col-sm-12 col-xs-12" id="toolbar">
+
+
+                            <form id="changelist-search" class="form-inline" method="get">
+
+                                <div class="form-group">
+                                    <select class="form-control select2 select2-hidden-accessible search-filter" style="width: 100%;" tabindex="-1" name="tbl_owner" aria-hidden="true" data-name="rule_type">
+                                        <option value="all">集群用户</option>
+                                        <option>---------</option>
+                                        {% for owner in owner_info %}
+                                        <option value="{{ owner.tbl_owner }}" {% ifequal tbl_owner owner.tbl_owner %} selected="selected" {% endifequal %}>{{ owner.tbl_owner }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- DIV needed for valid HTML -->
+                                <div class="form-group">
+                                    <input class="form-control" type="text" size="40" name="table_name" placeholder="表名称" value="{{ table_name }}" id="searchbar" autofocus="">
+                                </div>
+
+                                <div class="form-group" id="search_group">
+                                    <button type="submit" class="btn btn-primary" style="margin-right: 5px;">搜索</button>
+                                </div>
+
+                            </form>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                        </div>
+
+                        <form id="changelist-form" method="post" novalidate=""><input type="hidden" name="csrfmiddlewaretoken" value="hGowCWGRbECAAmqtcnygbRuX5np2SAO0WbipYeBYg0pKIsipfOKBa1lq9lBGyZLt">
+
+
+    <div class="dataTables_wrapper form-inline dt-bootstrap">
+    <div class="row">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6"></div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                <thead>
+                <tr role="row">
+                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending"><div class="text"><a href="#">
+                        Id</a> </div>
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending"><div class="text"><a href="#">
+                        集群用户</a> </div>
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending"><div class="text"><a href="#">
+                        表名称</a> </div>
+                    </th>
+
+                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column descending"><div class="text"><a href="#">
+                        空间大小</a> </div>
+                    </th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for stage in storage_info %}
+                <tr role="row" class="even">
+                    <td class="field-rule_name">{{ stage.id }}</td>
+                    <td class="field-rule_name">{{ stage.tbl_owner }}</td>
+                    <td class="field-rule_type">{{ stage.db_name }}.{{ stage.tbl_name }}</td>
+                    <td class="field-table_name">{{ stage.format_storage }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+
+    </div>
+
+    </div>
+                <div class="col-sm-5">
+                    <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
+                        {{ totalCount }} 存储空间列表
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+                        <ul class="pagination">
+                            {% if storage_info.has_previous %}
+                            <li class="paginate_button previous" id="example2_previous">
+                                <a href="?tbl_owner={{ tbl_owner }}&table_name={{ table_name }}&page={{ storage_info.previous_page_number }}" aria-controls="example2" data-dt-idx="0" tabindex="0">上一页</a>
+                            </li>
+                            {% else %}
+
+
+                            <li class="paginate_button previous disabled" >
+                                <a href="javascript:void(0);" aria-controls="example2" data-dt-idx="0" tabindex="0">上一页</a>
+                            </li>
+                            {% endif %}
+
+                            {% for now_page in page_range %}
+
+                            <li class="{% if now_page == page %} active {% endif %}"><a href="?tbl_owner={{ tbl_owner }}&table_name={{ table_name }}&page={{ now_page }}">{{ now_page }}</a></li>
+                            {% endfor %}
+
+                            {% if storage_info.has_next %}
+                            <li class="paginate_button next" id="example2_next">
+                                <a href="?tbl_owner={{ tbl_owner }}&table_name={{ table_name }}&page={{ storage_info.next_page_number }}" aria-controls="example2" data-dt-idx="7" tabindex="0">下一页</a>
+                            </li>
+                            {% else %}
+                            <li class="paginate_button next disabled" >
+                                <a href="javascript:void(0);" aria-controls="example2" data-dt-idx="7" tabindex="0">下一页</a>
+                            </li>
+
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript" src="{% static "js/chart.js" %}"></script>
+
+<script>
+
+
+</script>
+{% endblock %}

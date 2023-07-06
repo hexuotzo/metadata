@@ -1,0 +1,491 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block title %} 元数据表详情展示 | 元数据管理平台 {% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+{% endblock %}
+
+
+{% block content_title %} {{ indexInfo.table_name }} {% endblock %}
+
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> {% trans 'Home' %}</a></li>
+    <li><a href="/admin/metadata/hivesearch">元数据搜索</a></li>
+    <li class="active">表详情</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="box box-primary">
+    <section class="content">
+        <div id="reply_content" style="opacity:0;position:fixed; top:-100%;left:-100%;">
+            <svg id="svg-canvas" width="100%" height="500"></svg>
+            <div class="dialogNew">
+            <ul></ul>
+            </div>
+        </div>
+
+    <!-- 选项卡菜单-->
+    <ul id="myTab" class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#basic" role="tab" data-toggle="tab">基本信息</a></li>
+        <li><a href="#field" role="tab" data-toggle="tab">字段信息</a></li>
+        <li><a href="#partition" role="tab" data-toggle="tab">分区信息</a></li>
+        <li><a href="#depend" role="tab"  data-toggle="tab">血缘关系</a></li>
+        <li><a href="#use" role="tab" data-toggle="tab">使用信息</a></li>
+        <li><a href="#example" role="tab" data-toggle="tab">数据样例</a></li>
+    </ul>
+    <!-- 选项卡面板 -->
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="basic">
+            <fieldset class="box box-solid module aligned">
+
+                <div class="form-group field-file_protoc">
+                    <br />
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">表id:</div>
+                        <div class="col-sm-7">{{ indexInfo.table_id }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">表名称:</div>
+                        <div class="col-sm-7">{{ indexInfo.table_name }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">数据库名称:</div>
+                        <div class="col-sm-7">{{ indexInfo.db_name }}</div>
+                    </div>
+                     <div class="row div_height">
+                        <div class="col-sm-2 text-right">表类型</div>
+                        <div class="col-sm-7">{{ tableInfo.tbl_type }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">表所有者:</div>
+                        <div class="col-sm-7">{{ tableInfo.tbl_owner }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">是否上线:</div>
+                        <div class="col-sm-7">{% if tableInfo.is_online == 1 %} 是 {% else %} 否  {% endif %}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">存储地址:</div>
+                        <div class="col-sm-7">{{ tableInfo.location }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">分区字段</div>
+                        <div class="col-sm-7">{{ tableInfo.partition }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">表创建时间:</div>
+                        <div class="col-sm-7">{{ tableInfo.create_time }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">表更新时间:</div>
+                        <div class="col-sm-7">{{ tableExtend.last_ddl_time|date:'Y-m-d H:i:s' }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">存储格式:</div>
+                        <div class="col-sm-7">{{ tableExtend.storage_format }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">压缩格式:</div>
+                        <div class="col-sm-7">{{ tableExtend.compression }}</div>
+                    </div>
+                    <div class="row div_height">
+                        <div class="col-sm-2 text-right">表注释:</div>
+                        <div class="col-sm-7">{{ maintainInfo.table_desc_maintain }}</div>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+        <div class="tab-pane fade" id="field">
+            <fieldset class="box box-solid module aligned">
+                <br />
+            <p>描述不全，去<a href='/admin/metadata/hivetablecolumninfo/?id={{ indexInfo.table_id }}' target="_blank">维护信息</a></p>
+                <table id="result_list" width="800" class="table table-bordered table-hover dataTable">
+                  <thead>
+                  <tr>
+                      <th scope="col"><span>id</span></th>
+                      <th scope="col"><span>字段名称</span></th>
+                      <th scope="col"><span>类型</span></th>
+                      <th scope="col"><span>描述</span></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% for result in columnResult %}
+                    <tr>
+                      <td class="field">{{ result.column_idx }}</td>
+                      <td class="field">{{ result.column_name }}</td>
+                      <td class="field">{{ result.column_type }}</td>
+                      <td class="field">{{ result.column_desc_maintain }}</td>
+                    </tr>
+                  {% endfor %}
+
+                  </tbody>
+                </table>
+            </fieldset>
+        </div>
+
+        <div class="tab-pane fade" id="partition">
+            <br />
+            <fieldset class="box-solid module aligned">
+                <div class="col-md-12">
+                <table  width="800" class="table table-bordered table-hover dataTable">
+                  <thead>
+                  <tr>
+                      <th scope="col"><span>数据日期</span></th>
+                      <th scope="col"><span>存储大小</span></th>
+                      <th scope="col"><span>记录数</span></th>
+                      <th scope="col"><span>最后修改时间</span></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% for result in tableCapacity %}
+                    <tr>
+                      <td class="field">{{ result.calculate_date }}</td>
+                      <td class="field">{{ result.storage }} M</td>
+                      <td class="field">{{ result.records }}</td>
+                      <td class="field">{{ result.last_ddl_date  }}</td>
+                    </tr>
+                  {% endfor %}
+
+                  </tbody>
+                </table>
+                </div>
+                <div class="col-md-6">
+                  <div class="box ">
+                    <div class="box-header with-border">
+                      <h3 class="box-title">空间占用情况</h3>
+
+                      <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                      </div>
+                    </div>
+                    <div class="box-body">
+                      <div class="chart">
+                        <canvas id="lineChart" style="height: 249px; width: 555px;" height="498" width="1110"></canvas>
+                      </div>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="box ">
+                    <div class="box-header with-border">
+                      <h3 class="box-title">表记录行数</h3>
+
+                      <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                      </div>
+                    </div>
+                    <div class="box-body">
+                      <div class="chart">
+                        <canvas id="lineChart2" style="height: 249px; width: 555px;" height="498" width="1110"></canvas>
+                      </div>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="tab-pane fade" id="depend">
+            <br />
+            <br />
+
+
+
+            <input type="hidden" id="dataflow_val" value="{{ dependArr }} " />
+            <input type="hidden" id="lineDataX" value="{{ lineDataX }}" />
+            <input type="hidden" id="lineDataY" value="{{ lineDataY }}" />
+            <input type="hidden" id="lineDataRow" value="{{ lineDataRow }}" />
+
+        </div>
+        <div class="tab-pane fade" id="use">
+            <br />
+            <fieldset class="box-solid module aligned">
+
+            <p>使用信息不全，去<a href='/admin/metadata/hivetablemaintain/{{maintainInfo.id}}/change/' target="_blank">完善信息</a></p>
+
+            {% if maintainInfo.usage_desc != None %}
+            <p>{{ maintainInfo.usage_desc|linebreaksbr }}</p>
+            {% endif %}
+            </fieldset>
+        </div>
+        <div class="tab-pane fade" id="example">
+            <br />
+            <div style="overflow-x: auto; overflow-y: auto; height: 400px;" >
+            <table  class="table table-bordered table-hover dataTable">
+                  <thead>
+                  <tr>
+                      {% for column in exampleField %}
+                      <th scope="col"><span>{{ column }}</span></th>
+                      {% endfor %}
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {% for data in exampleData %}
+                    <tr>
+                        {% for key,value in data.items %}
+                      <td class="field">{{ value }}  </td>
+                        {% endfor %}
+
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+
+
+        </div>
+
+    </div>
+    </section>
+    </div>
+    <br class="clear">
+  </div>
+<style>
+  .control-label{margin-top:7px;}
+  .div_height{line-height:35px;}
+  .list_row{margin-bottom:15px; margin-left:20px;}
+  .result_row{width:900px; word-wrap:break-word;}
+
+  /*血缘关系样式 */
+  g.type-current>rect {fill: #1E9FFF;}
+text {
+    font-weight: 300;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+    font-size: 14px;
+}
+.node rect {
+    stroke: #999;
+    fill: #fff;
+    stroke-width: 1.5px;
+}
+.edgePath path {
+    stroke: #333;
+    stroke-width: 1.5px;
+}
+ul,li{
+    margin: 0;
+    padding: 0;
+}
+.dialog{
+    display: none;
+    position: absolute;
+    z-index: 10;
+    margin-top: 40px;
+}
+.dialog ul{
+    background: #eee;
+    border: 1px solid #666;
+}
+.dialog li{
+    height: 30px;
+    line-height: 30px;
+    color: black;
+    padding: 0 10px;
+    list-style: none;
+    cursor: pointer;
+}
+
+</style>
+
+<script type="text/javascript" src="{% static "js/jquery.min.js" %}" ></script>
+<script>
+jQuery.browser={};(function(){jQuery.browser.msie=false; jQuery.browser.version=0;if(navigator.userAgent.match(/MSIE ([0-9]+)./)){ jQuery.browser.msie=true;jQuery.browser.version=RegExp.$1;}})();
+</script>
+<script type="text/javascript" src="{% static "js/dagre-d3.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/d3.v3.min.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/chart.js" %}" ></script>
+
+<script>
+    var dataFlow = $("#dataflow_val").val();
+    console.log(dataFlow)
+    var flowArr = eval('(' + dataFlow + ')');
+    console.log(typeof(flowArr));
+
+
+    var dataFlow = flowArr;
+
+    var active=''
+    // Create the input graph
+    var g = new dagreD3.graphlib.Graph()
+        .setGraph({})
+        .setDefaultEdgeLabel(function () { return {}; });
+
+    // 先设置node
+    for(var i in dataFlow){
+        flowValue = flowArr[i];
+        g.setNode(flowValue['id'],{
+            label:flowValue['label'],
+            class:"type-" + flowValue['status'],
+        });
+    }
+
+    console.log(g.nodes())
+    // 再划线展示关系
+    for(var j in dataFlow){
+        flowValue = flowArr[j];
+
+        if(flowValue['target'] && !flowValue['back_target']){
+            console.log(flowValue['label'])
+            g.setEdge(flowValue['id'],flowValue['target'],{})
+        }else{
+            console.log(flowValue['target']+'is null')
+        }
+    }
+
+    g.nodes().forEach(function (v) {
+        var node = g.node(v);
+        // Round the corners of the nodes
+        node.rx = node.ry = 5;
+    });
+
+    // Create the renderer
+    var render = new dagreD3.render();
+
+    // Set up an SVG group so that we can translate the final graph.
+    var svg = d3.select("svg"),
+        svgGroup = svg.append("g");
+
+    // Run the renderer. This is what draws the final graph.
+    render(d3.select("svg g"), g);
+
+    var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
+    svgGroup.attr("transform", "translate(" + 20 + ", 20)");
+    svg.attr("height", g.graph().height + 40);
+    // 增加事件
+
+    var view = {
+        'label': 'docs',
+        'onClick': function() { console.log('clicked ' + this.label); }
+     };
+
+     var drag = d3.behavior.drag().on("drag", dragmove);
+
+     function dragmove(d){
+         console.log(d3.select(this).attr("transform"))
+         xy = d3.select("svg g").attr("transform").replace('translate(', '').replace(')', '').split(',')
+         xy[0] = parseFloat(xy[0]) + d3.event.dx
+         xy[1] = parseFloat(xy[1]) + d3.event.dy
+         d3.select("svg g").attr("transform", "translate(" +xy[0] +"," + xy[1]+")");
+     }
+
+    //_.bindAll(view);
+    svgGroup.selectAll("g.node").on('click', function (v) {
+        // //显示提示信息方案一：更新提示条位置和值
+        // d3.select("#tooltip")
+        //     .attr("style", "left:" + g.node(v).x + "px" + ";top:" + g.node(v).y + "px")
+        //     .select("#tooltip_value")
+        //     .text("规则描述：" + g.node(v).description);
+        // //显示提示条
+        // d3.select("#tooltip").classed("hidden", false);
+        console.log(v)
+        console.log(g.node(v).label)
+
+        //显示提示信息方案二：
+        // d3.select(this).attr("fill", "#f34848").append("title").text(function (d) {
+        //     return "规则描述：" + g.node(v).description;
+        // }).attr("id", "tooltip");
+    }).call(drag);
+
+    $(".node").on('click', function (e) {
+        var offset=$(this).offset()
+        active=$(this).find('tspan').text()
+        $('.dialog ul').html(`<li>操作1</li><li>操作2</li><li>操作3</li>`)
+        $('.dialog').css({'left':offset.left+'px','top':offset.top+'px','width':$(this).find('.label-container').width()+'px'}).show()
+    });
+
+    $(".dialog").on('mouseleave', function (e) {
+        $('.dialog').hide()
+    });
+    $('.dialog').on('click',"li", function (e) {
+        idx=$(this).index()
+        if(idx==0){
+            alert(`操作1 ${active}`)
+        }else if(idx==1){
+            alert(`操作2 ${active}`)
+        }else if(idx==2){
+            alert(`操作3 ${active}`)
+        }
+    });
+
+    replyContent = $("#reply_content").html()
+    //console.log(replyContent)
+    $("#depend").append(replyContent)
+</script>
+<script>
+
+const ctx = document.getElementById('lineChart').getContext('2d');
+const ctx2 = document.getElementById('lineChart2').getContext('2d');
+
+// eval('(' + dataFlow + ')')
+var dataX = $("#lineDataX").val();
+var dataY = $("#lineDataY").val();
+var dataRow = $("#lineDataRow").val();
+
+console.log(dataX)
+console.log(dataY)
+var lineDataX = dataX.split(',').reverse()
+var lineDataY = dataY.split(',').reverse()
+var lineDataRow = dataRow.split(',').reverse()
+
+const labels = lineDataX;
+const dataStorageData = {
+  labels: labels,
+  datasets: [{
+    label: '占用空间(单位Mb)',
+    data: lineDataY,
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  }]
+};
+
+const dataRowData = {
+  labels: labels,
+  datasets: [{
+    label: '行数',
+    data: lineDataRow,
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  }]
+};
+
+const myChart = new Chart(ctx, {
+    type: 'line',
+    data: dataStorageData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+const myChart2 = new Chart(ctx2, {
+    type: 'line',
+    data: dataRowData,
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+</script>
+{% endblock %}

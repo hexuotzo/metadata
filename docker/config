@@ -1,0 +1,16 @@
+# local
+local_port_one=8087
+local_port_two=9999
+local_code_dir=/data/www/docker_code/alakir/
+# container
+container_port_one=8888
+container_port_two=9999
+container_code_dir=/code/alakir/
+# name
+images_repository=centos
+images_tag=alakir
+container_name=alakir
+# threads_num
+threads_number=2
+# port_num
+port_number=1

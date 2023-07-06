@@ -1,0 +1,443 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_list %}
+
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+
+        <form action="" method="post" id="monitor_real_form">
+            {% csrf_token %}
+        <div class="col-md-9">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        实时监控任务修改
+                    </h4>
+                </div>
+                <input type="hidden" name="id" value="{{ object_id }}" />
+                <div class="box-body">
+                    <div class="form-group">
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">监控方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="" style="width: 100%;" name="monitor_mode" id="monitor_mode" required >
+                                        <option value="">请选择监控方式</option>
+                                        <option  value="3" {% ifequal task_monitor.monitor_mode 3 %} selected {% endifequal %}>kafka积压量监控</option>
+                                        <option  value="4" {% ifequal task_monitor.monitor_mode 4 %} selected {% endifequal %}>任务活性监控</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group" id="task_from_div" style="display:{% ifequal task_monitor.monitor_mode 4 %}''; {% else %} none; {% endifequal %}">
+                            <label class="col-sm-2 control-label text-right">任务来源</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="vSelectField" style="width: 100%;" required name="task_from" id="task_from" >
+                                <option value="">请选择来源</option>
+                                    <option  value="1" {% ifequal task_monitor.task_from 1 %} selected {% endifequal %}>streamx任务</option>
+                                    <option  value="2" {% ifequal task_monitor.task_from 2 %} selected {% endifequal %}>后台任务</option>
+
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row form-group" id="task_ip_div" style="display:{% ifequal task_monitor.task_from 2 %}''; {% else %} none; {% endifequal %}">
+                            <label class="col-sm-2 control-label text-right">IP</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="vSelectField" style="width: 100%;" name="task_ip" id="task_ip" >
+                                    <option value="ssh_209" {% ifequal monitor_dict.ip 'ssh_209' %} selected {% endifequal %}>192.168.134.209</option>
+                                    <option value="ssh_207" {% ifequal monitor_dict.ip 'ssh_207' %} selected {% endifequal %}>192.168.134.207</option>
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row form-group" id="task_name_custom_div" style="display:{% ifequal task_monitor.task_from 2 %}''; {% else %} none; {% endifequal %}">
+                            <label class="col-sm-2 control-label text-right">任务标识</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                 <input type="text" name="task_name_custom" required class="vTextField" value="{{ task_monitor.task_identification }}" maxlength="100" id="task_name_custom">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row form-group" id="identification_div" style="display:{% ifequal task_monitor.task_from 1 %}''; {% else %} none; {% endifequal %}">
+                            <label class="col-sm-2 control-label text-right">任务标识</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="vSelectField" required style="width: 100%;" name="task_identification" id="task_identification" >
+                                <option value="">请选择任务</option>
+                                {% for task in task_all %}
+                                    <option  value="{{ task.name }}" {% if task_monitor.task_identification == task.name %} selected {% endif %}>{{ task.name }}</option>
+                                {% endfor %}
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">任务名称</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="monitor_name" value="{{ task_monitor.monitor_name }}" class="vTextField" maxlength="100" required="" id="monitor_name">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="kafka_div" style="display:{% ifequal task_monitor.monitor_mode 3 %}''; {% else %} none; {% endifequal %}">
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">Brokes</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="brokes" value="{{ monitor_dict.brokes }}" class="vTextField" maxlength="100" id="brokes">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                         <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">Topic</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="topic" value="{{ monitor_dict.topic }}" class="vTextField" maxlength="100" id="topic">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">GroupId</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="group_id" value="{{ monitor_dict.group_id }}" class="vTextField" maxlength="100" id="group_id">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">阀值</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <input type="text" name="max_value" value="{{ monitor_dict.max_value }}" class="vTextField" maxlength="100" id="monitor_value">
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">责任人</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="select2" style="width: 100%;" name="owner_id" >
+                                    <option value="">请选择</option>
+                                    {% for user in user_list %}
+                                        <option  value="{{ user.username }}" {% ifequal task_monitor.owner_name user.username %} selected {% endifequal %}>{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">报警接收人</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select class="vSelectField select2" multiple  style="width: 100%;" name="receivers[]" >
+                                    {% for user in project_and_user %}
+                                        <option  value="{{ user.id }}" {% if user.id in receiver %} selected {% endif %} >{{ user.name }}</option>
+                                    {% endfor %}
+
+                                </select>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">报警发送时间</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="is_warning_custom" id="is_warning_custom">
+                                    <option value="1" {% if task_monitor.is_warning_custom == 1 %} selected {% endif %}>系统自动</option>
+                                    <option value="2" {% if task_monitor.is_warning_custom == 2 %} selected {% endif %}>自定义时间</option>
+                                </select>
+                                <span id="warning_send_time_div" style="display:{% if task_monitor.is_warning_custom == 1 %} none {% else %} '' {% endif %};">
+                                <input type="text" name="warning_send_time" class="timepicker" maxlength="100" value="{{ task_monitor.warning_send_time }}" id="warning_send_time">
+                                </span>
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">报警方式</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="warning_type">
+                                    <option value="1">邮件</option>
+                                </select>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label class="col-sm-2 control-label text-right">状态</label>
+                            <div class="col-sm-7">
+                                <span class="text-red" style="margin-left: -10px;">* </span>
+                                <select name="status">
+                                    <option value="1" {% if task_monitor.status == 1 %} selected {% endif %}>上线</option>
+                                    <option value="2" {% if task_monitor.status == 2 %} selected {% endif %}>下线</option>
+                                </select>
+
+                                <div class="help-block red"></div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="help-block text-red"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 hidden-sm hidden-xs">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h4 class="box-title">
+                        操作面板
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <input type="submit" value="保存" class="btn btn-primary form-control" name="_save">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="button" value="返回任务监控列表" id="return_task" class="btn btn-primary form-control" name="_save">
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="task_name_exist" value="0" />
+        </div>
+        </form>
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+{% block extrajs %}
+<link rel="stylesheet" href={% static "css/timepicker.min.css" %}>
+
+<style>
+
+.select2-container-multi .select2-choices li {
+    float: none;
+    list-style: none;
+}
+
+.timepicker{
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+</style>
+<script type="text/javascript" src="{% static "js/timepicker.min.js" %}"></script>
+
+
+<script>
+$('.timepicker').timepicker({
+    'timeFormat': 'HH:mm',
+    'minTime': '08:00:00'
+});
+
+$(".select2").select2({
+    placeholder : '请选择',
+});
+$("#return_task").click(function(){
+    window.location.href='/admin/schedule/monitoroff'
+});
+
+//$("#warning_send_time").Timepicker();
+
+$('#monitor_mode').change(function(){
+    if($(this).val() == '3'){
+        $('.kafka_div').show();
+        $('#brokes').attr('required','');
+        $('#topic').attr('required','');
+        $('#group_id').attr('required','');
+        $('#monitor_value').attr('required','');
+
+        $("#identification_div").hide();
+        $("#task_identification").removeAttr('required','');
+
+        $("#task_from_div").hide();
+
+
+    }else if($(this).val() == '4'){
+        $('.kafka_div').hide();
+        $('#brokes').removeAttr('required','')
+        $('#topic').removeAttr('required','')
+        $('#group_id').removeAttr('required','')
+        $('#monitor_value').removeAttr('required','')
+
+        //$("#identification_div").show();
+        $("#task_identification").attr('required','');
+        $("#task_from_div").show()
+    }
+})
+
+// 任务来源切换
+$("#task_from").change(function(){
+    if($(this).val() == '1'){
+        $("#identification_div").show();
+        $("#task_ip_div").hide();
+        $("#task_name_custom_div").hide();
+
+        $('#task_name_custom').removeAttr('required','');
+        $("#task_identification").attr('required','')
+
+    }else if($(this).val() == '2'){
+        $("#identification_div").hide();
+        $("#task_ip_div").show();
+        $("#task_name_custom_div").show();
+
+        $('#task_name_custom').attr('required','');
+        $("#task_identification").removeAttr('required','');
+    }
+})
+
+
+// 初始化相关属性
+if($("#task_from").val() == '1'){
+    $('#task_name_custom').removeAttr('required','');
+    $("#task_identification").attr('required','')
+    console.log('bb')
+}else if($("#task_from").val() == '2'){
+    $('#task_name_custom').attr('required','');
+    $("#task_identification").removeAttr('required','');
+    console.log('aaa')
+}
+
+if($("#monitor_mode").val() == '3'){
+    $('#task_from').removeAttr('required','');
+    console.log('kafka monitor')
+    $('#task_name_custom').removeAttr('required','');
+    $("#task_identification").removeAttr('required','')
+
+}
+
+
+
+
+$("#is_warning_custom").change(function(){
+    if($(this).val() == '1'){
+        $('#warning_send_time_div').hide();
+        $("#warning_send_time").removeAttr('required','');
+    }else if($(this).val()== '2'){
+        $('#warning_send_time_div').show();
+        $("#warning_send_time").attr('required','');
+    }
+
+});
+
+
+
+$('#monitor_form').submit(function(){
+    identification_name = $("#task_identification").val()
+    monitor_mode_val = $("#monitor_mode").val()
+
+    $.ajax({
+        type:"GET",
+        async:false,
+        url:" /ajax/get_monitor_exist/?monitor_mode=" + monitor_mode_val + "&task_identification=" + identification_name,
+        dataType:"json",
+        success:function(res){
+            if(res.success!='ok'){
+                alert('该任务的监控方式已存在，不要重复添加');
+                $("#task_name_exist").val('1');
+                return false;
+            }else{
+                //alert("验证通过");
+                $("#task_name_exist").val('0');
+            }
+        }
+    });
+    console.log($("#task_name_exist").val());
+    //return false;
+
+    if($("#task_name_exist").val() == '1'){
+        console.log('==1');
+        return false;
+    }else{
+        console.log('!==1');
+    }
+
+
+})
+</script>
+{% endblock %}
